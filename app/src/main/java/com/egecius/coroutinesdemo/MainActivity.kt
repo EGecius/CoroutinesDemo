@@ -3,16 +3,30 @@ package com.egecius.coroutinesdemo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        button.setOnClickListener {
+        setClickListener()
+    }
 
+    private fun setClickListener() {
+        button.setOnClickListener {
+            CoroutineScope(IO).launch {
+                fakeApiRequest()
+            }
         }
+    }
+
+    private suspend fun fakeApiRequest() {
+        val result1 = getResult1FromApi()
+        println("debug: $result1")
     }
 
 
