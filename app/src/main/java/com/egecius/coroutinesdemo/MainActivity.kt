@@ -27,17 +27,22 @@ class MainActivity : AppCompatActivity() {
     private fun fetchFakeApiRequestAndUpdateUi() {
         CoroutineScope(IO).launch {
             // starting in IO thread
-            val result1 = getResult1FromApi()
+            val result1 = getResultFromApi(RESULT_1)
             println("debug: $result1")
             // now will switch to Main thread to update the UI:
             setTextOnMainThread(result1)
+            // now will get another result which still will be fetched on IO thread:
+            val result2 = getResultFromApi(RESULT_2)
+            println("debug: $result2")
+            // now will switch to Main thread to update the UI:
+            setTextOnMainThread(result2)
         }
     }
 
-    private suspend fun getResult1FromApi(): String {
+    private suspend fun getResultFromApi(result: String): String {
         logThread("getResult1FromApi")
         delay(1000)
-        return RESULT_1
+        return result
     }
 
     private fun logThread(methodName: String) {
@@ -53,5 +58,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val RESULT_1 = "Result 1"
+        private const val RESULT_2 = "Result 2"
     }
 }
