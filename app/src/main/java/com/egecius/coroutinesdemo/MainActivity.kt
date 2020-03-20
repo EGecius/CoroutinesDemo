@@ -20,23 +20,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun setClickListener() {
         button.setOnClickListener {
-            CoroutineScope(IO).launch {
-                fetchFakeApiRequestAndUpdateUi()
-            }
+            fetchFakeApiRequestAndUpdateUi()
         }
     }
 
-    private suspend fun setTextOnMainThread(input: String) {
-        withContext(Main) {
-            val newText = text_view.text.toString() + "\n" + input
-            text_view.text = newText
+    private fun fetchFakeApiRequestAndUpdateUi() {
+        CoroutineScope(IO).launch {
+            // starting in IO thread
+            val result1 = getResult1FromApi()
+            println("debug: $result1")
+            // now will switch to Main thread to update the UI:
+            setTextOnMainThread(result1)
         }
-    }
-
-    private suspend fun fetchFakeApiRequestAndUpdateUi() {
-        val result1 = getResult1FromApi()
-        println("debug: $result1")
-        setTextOnMainThread(result1)
     }
 
     private suspend fun getResult1FromApi(): String {
@@ -47,6 +42,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun logThread(methodName: String) {
         println("debug: ${methodName}: ${Thread.currentThread().name}")
+    }
+
+    private suspend fun setTextOnMainThread(input: String) {
+        withContext(Main) {
+            val newText = text_view.text.toString() + "\n" + input
+            text_view.text = newText
+        }
     }
 
     companion object {
