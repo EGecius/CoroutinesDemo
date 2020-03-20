@@ -4,12 +4,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_job.*
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class JobActivity : AppCompatActivity() {
 
@@ -37,6 +34,7 @@ class JobActivity : AppCompatActivity() {
     private fun startProgress() {
         CoroutineScope(IO + job).launch {
             for (i in START..MAX) {
+                delay(DELAY)
                 progressBar.progress = i
             }
         }
@@ -61,6 +59,7 @@ class JobActivity : AppCompatActivity() {
         const val START = 0
         const val MAX = 100
     	const val TIME_IN_MS = 4000
+        const val DELAY : Long = (TIME_IN_MS / MAX).toLong()
 
     }
 }
