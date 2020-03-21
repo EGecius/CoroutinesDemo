@@ -27,7 +27,15 @@ class JobActivity : AppCompatActivity() {
 
     private fun setupListener() {
         button.setOnClickListener {
-        	startProgress()
+            if (progressBar.progress > 0) {
+                job.cancel()
+                initJob()
+                progressBar.progress = START
+                button.text = getString(R.string.start)
+            } else {
+                startProgress()
+                button.text = getString(R.string.cancel)
+            }
         }
     }
 
@@ -58,7 +66,7 @@ class JobActivity : AppCompatActivity() {
     companion object {
         const val START = 0
         const val MAX = 100
-    	const val TIME_IN_MS = 4000
+    	private const val TIME_IN_MS = 4000
         const val DELAY : Long = (TIME_IN_MS / MAX).toLong()
 
     }
