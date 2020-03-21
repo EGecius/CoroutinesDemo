@@ -12,13 +12,7 @@ import kotlinx.coroutines.Dispatchers.Main
 
 class JobActivity : AppCompatActivity() {
 
-    private val TAG: String = "AppDebug"
-
-    private val PROGRESS_MAX = 100
-    private val PROGRESS_START = 0
-    private val JOB_TIME = 4000 // ms
     private lateinit var job: CompletableJob
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,21 +20,21 @@ class JobActivity : AppCompatActivity() {
 
         job_button.setOnClickListener {
             if (!::job.isInitialized) {
-                initjob()
+                initJob()
             }
             job_progress_bar.startJobOrCancel(job)
         }
     }
 
-    fun resetjob() {
+    private fun resetJob() {
         if (job.isActive || job.isCompleted) {
             job.cancel(CancellationException("Resetting job"))
         }
-        initjob()
+        initJob()
     }
 
-    fun initjob() {
-        job_button.setText("Start Job #1")
+    private fun initJob() {
+        job_button.text = "Start Job #1"
         updateJobCompleteTextView("")
         job = Job()
         job.invokeOnCompletion {
@@ -49,7 +43,7 @@ class JobActivity : AppCompatActivity() {
                 if (msg.isNullOrBlank()) {
                     msg = "Unknown cancellation error."
                 }
-                Log.e(TAG, "${job} was cancelled. Reason: ${msg}")
+                Log.e(TAG, "$job was cancelled. Reason: ${msg}")
                 showToast(msg)
             }
         }
@@ -58,14 +52,14 @@ class JobActivity : AppCompatActivity() {
     }
 
 
-    fun ProgressBar.startJobOrCancel(job: Job) {
+    private fun ProgressBar.startJobOrCancel(job: Job) {
         if (this.progress > 0) {
-            Log.d(TAG, "${job} is already active. Cancelling...")
-            resetjob()
+            Log.d(TAG, "$job is already active. Cancelling...")
+            resetJob()
         } else {
-            job_button.setText("Cancel Job #1")
+            job_button.text = "Cancel Job #1"
             CoroutineScope(IO + job).launch {
-                Log.d(TAG, "coroutine ${this} is activated with job ${job}.")
+                Log.d(TAG, "coroutine $this is activated with job ${job}.")
 
                 for (i in PROGRESS_START..PROGRESS_MAX) {
                     delay((JOB_TIME / PROGRESS_MAX).toLong())
@@ -78,7 +72,7 @@ class JobActivity : AppCompatActivity() {
 
     private fun updateJobCompleteTextView(text: String) {
         GlobalScope.launch(Main) {
-            job_complete_text.setText(text)
+            job_complete_text.text = text
         }
     }
 
@@ -91,5 +85,14 @@ class JobActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
+    }
+
+    companion object {
+
+        private const val TAG: String = "AppDebug"
+
+        private const val PROGRESS_MAX = 100
+        private const val PROGRESS_START = 0
+        private const val JOB_TIME = 4000 // ms
     }
 }
