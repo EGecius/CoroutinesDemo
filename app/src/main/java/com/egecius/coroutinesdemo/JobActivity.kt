@@ -42,6 +42,7 @@ class JobActivity : AppCompatActivity() {
                 delay(DELAY)
                 job_progress_bar.progress = i
             }
+            job.complete()
         }
         job_button.text = getString(R.string.cancel)
     }
@@ -49,12 +50,23 @@ class JobActivity : AppCompatActivity() {
     private fun initJob() {
         job = Job()
         job.invokeOnCompletion {
-            val msg = it?.message ?: "unknown cause"
-            val name = Thread.currentThread().name
-            // invokeOnCompletion is called on the thread as the scope that the job was added to
-            Log.i("Eg:JobActivity:58", "initJob invokeOnCompletion thread name: $name")
-            showToast(msg)
-            resetViews()
+            val isCancelled = it != null
+            if (isCancelled) {
+                val msg = it?.message ?: "unknown cause"
+                val name = Thread.currentThread().name
+                // invokeOnCompletion is called on the thread as the scope that the job was added to
+                Log.i("Eg:JobActivity:58", "initJob invokeOnCompletion thread name: $name")
+                showToast(msg)
+                resetViews()
+            } else {
+                showJobCompleteView()
+            }
+        }
+    }
+
+    private fun showJobCompleteView() {
+        GlobalScope.launch(Main) {
+            job_complete_text.text = getString(R.string.job_complete)
         }
     }
 
@@ -69,6 +81,7 @@ class JobActivity : AppCompatActivity() {
             job_progress_bar.progress = PROGRESS_START
             job_progress_bar.max = PROGRESS_MAX
             job_button.text = getString(R.string.start)
+            job_complete_text.text = ""
         }
     }
 
