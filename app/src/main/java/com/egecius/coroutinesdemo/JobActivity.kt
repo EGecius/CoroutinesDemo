@@ -34,13 +34,6 @@ class JobActivity : AppCompatActivity() {
     private fun resetJob() {
         job.cancel()
         initJob()
-        resetViews()
-    }
-
-    private fun resetViews() {
-        job_progress_bar.progress = PROGRESS_START
-        job_progress_bar.max = PROGRESS_MAX
-        job_button.text = "Start"
     }
 
     private fun startJob() {
@@ -60,12 +53,21 @@ class JobActivity : AppCompatActivity() {
             // invokeOnCompletion is called on the thread as the scope that the job was added to
             Log.i("Eg:JobActivity:58", "initJob invokeOnCompletion thread name: $name")
             showToast(msg)
+            resetViews()
         }
     }
 
     private fun showToast(msg: String) {
         GlobalScope.launch(Main) {
             Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun resetViews() {
+        GlobalScope.launch(Main) {
+            job_progress_bar.progress = PROGRESS_START
+            job_progress_bar.max = PROGRESS_MAX
+            job_button.text = "Start"
         }
     }
 
