@@ -21,8 +21,10 @@ class AsyncAwaitActivity : AppCompatActivity() {
         button_async_await.setOnClickListener {
             CoroutineScope(IO).launch {
 
+                val time0 = System.currentTimeMillis()
+
                 val deferred1: Deferred<String> = async {
-                    delay(1000L)
+                    delay(500L)
                     "result 1"
                 }
                 val deferred2: Deferred<String> = async {
@@ -30,10 +32,12 @@ class AsyncAwaitActivity : AppCompatActivity() {
                     "result 2"
                 }
 
-                val result1 = deferred1.await()
-                val result2 = deferred2.await()
-                Log.v("Eg:AsyncAwaitActivity:32", "setupClickListener() result1: $result1")
-                Log.v("Eg:AsyncAwaitActivity:36", "setupClickListener() result2: $result2")
+                val result1 = deferred1.await() // now this will suspend execution of this block until deferred1 returns
+                val diff1 = System.currentTimeMillis() - time0
+                Log.v("Eg:AsyncAwaitActivity:32", "setupClickListener() result1: $result1 in $diff1 ms")
+                val result2 = deferred2.await() // again, block execution will be returned until deferred2 returns
+                val diff2 = System.currentTimeMillis() - time0
+                Log.v("Eg:AsyncAwaitActivity:32", "setupClickListener() result1: $result2 in $diff2 ms")
             }
         }
     }
