@@ -2,7 +2,6 @@ package com.egecius.coroutinesdemo
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_job.*
@@ -17,12 +16,10 @@ class JobActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_job)
+        initJob()
 
         job_button.setOnClickListener {
-            if (!::job.isInitialized) {
-                initJob()
-            }
-            job_progress_bar.startJobOrCancel(job)
+            startJobOrCancel()
         }
     }
 
@@ -38,13 +35,10 @@ class JobActivity : AppCompatActivity() {
         updateJobCompleteTextView("")
         job = Job()
         job.invokeOnCompletion {
-            it?.message.let {
-                var msg = it
-                if (msg.isNullOrBlank()) {
-                    msg = "Unknown cancellation error."
-                }
-                Log.e(TAG, "$job was cancelled. Reason: ${msg}")
-                showToast(msg)
+            it?.message.let { msg ->
+                val msgToPrint = if (msg.isNullOrBlank()) "Unknown cancellation error." else msg
+                Log.e(TAG, "$job was cancelled. Reason: $msgToPrint")
+                showToast(msgToPrint)
             }
         }
         job_progress_bar.max = PROGRESS_MAX
@@ -52,18 +46,18 @@ class JobActivity : AppCompatActivity() {
     }
 
 
-    private fun ProgressBar.startJobOrCancel(job: Job) {
-        if (this.progress > 0) {
+    private fun startJobOrCancel() {
+        if (job_progress_bar.progress > 0) {
             Log.d(TAG, "$job is already active. Cancelling...")
             resetJob()
         } else {
             job_button.text = "Cancel Job #1"
             CoroutineScope(IO + job).launch {
-                Log.d(TAG, "coroutine $this is activated with job ${job}.")
+                Log.d(TAG, "coroutine $this is activated with job $job.")
 
                 for (i in PROGRESS_START..PROGRESS_MAX) {
                     delay((JOB_TIME / PROGRESS_MAX).toLong())
-                    this@startJobOrCancel.progress = i
+                    job_progress_bar.progress = i
                 }
                 updateJobCompleteTextView("Job is complete!")
             }
