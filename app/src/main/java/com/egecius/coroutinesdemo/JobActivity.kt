@@ -1,13 +1,11 @@
 package com.egecius.coroutinesdemo
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_job.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 
 class JobActivity : AppCompatActivity() {
 
@@ -19,66 +17,51 @@ class JobActivity : AppCompatActivity() {
         initJob()
 
         job_button.setOnClickListener {
-            startJobOrCancel()
+            startOrResetJob()
+        }
+    }
+
+    private fun startOrResetJob() {
+        if (job_progress_bar.progress > 0) {
+            resetJob()
+        } else {
+            startJob()
         }
     }
 
     private fun resetJob() {
-        if (job.isActive || job.isCompleted) {
-            job.cancel(CancellationException("Resetting job"))
-        }
+        job.cancel()
         initJob()
+        resetViews()
+    }
+
+    private fun resetViews() {
+        job_progress_bar.progress = PROGRESS_START
+        job_progress_bar.max = PROGRESS_MAX
+        job_button.text = "Start"
+    }
+
+    private fun startJob() {
+        CoroutineScope(IO + job).launch {
+            for (i in PROGRESS_START..PROGRESS_MAX) {
+                delay(DELAY)
+                job_progress_bar.progress = i
+            }
+        }
     }
 
     private fun initJob() {
         job = Job()
         job.invokeOnCompletion {
-            it?.message.let { msg ->
-                val msgToPrint = if (msg.isNullOrBlank()) "Unknown cancellation error." else msg
-                Log.e(TAG, "$job was cancelled. Reason: $msgToPrint")
-                showToast(msgToPrint)
-            }
-        }
-        resetViews()
-    }
-
-    private fun resetViews() {
-        job_progress_bar.max = PROGRESS_MAX
-        job_progress_bar.progress = PROGRESS_START
-        job_button.text = "Start Job #1"
-        updateJobCompleteTextView("")
-    }
-
-
-    private fun startJobOrCancel() {
-        if (job_progress_bar.progress > 0) {
-            Log.d(TAG, "$job is already active. Cancelling...")
-            resetJob()
-        } else {
-            job_button.text = "Cancel Job #1"
-            CoroutineScope(IO + job).launch {
-                Log.d(TAG, "coroutine $this is activated with job $job.")
-
-                for (i in PROGRESS_START..PROGRESS_MAX) {
-                    delay((JOB_TIME / PROGRESS_MAX).toLong())
-                    job_progress_bar.progress = i
-                }
-                updateJobCompleteTextView("Job is complete!")
-            }
+            val msg = it?.message ?: "unknown cause"
+            showToast(msg)
         }
     }
 
-    private fun updateJobCompleteTextView(text: String) {
-        GlobalScope.launch(Main) {
-            job_complete_text.text = text
-        }
+    private fun showToast(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    private fun showToast(text: String) {
-        GlobalScope.launch(Main) {
-            Toast.makeText(this@JobActivity, text, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -91,6 +74,7 @@ class JobActivity : AppCompatActivity() {
 
         private const val PROGRESS_MAX = 100
         private const val PROGRESS_START = 0
-        private const val JOB_TIME = 4000 // ms
+        private const val JOB_TIME = 2000 // ms
+        private const val DELAY = (JOB_TIME / PROGRESS_MAX).toLong()
     }
 }
