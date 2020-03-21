@@ -43,6 +43,7 @@ class JobActivity : AppCompatActivity() {
                 job_progress_bar.progress = i
             }
         }
+        job_button.text = getString(R.string.cancel)
     }
 
     private fun initJob() {
@@ -67,7 +68,7 @@ class JobActivity : AppCompatActivity() {
         GlobalScope.launch(Main) {
             job_progress_bar.progress = PROGRESS_START
             job_progress_bar.max = PROGRESS_MAX
-            job_button.text = "Start"
+            job_button.text = getString(R.string.start)
         }
     }
 
