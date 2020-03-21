@@ -24,7 +24,7 @@ class JobActivity : AppCompatActivity() {
     }
 
     private fun startOrResetJob() {
-        if (job_progress_bar.progress > 0) {
+        if (job_progress_bar.progress > 0 && job_progress_bar.progress != PROGRESS_MAX) {
             resetJob()
         } else {
             startJob()
@@ -45,6 +45,7 @@ class JobActivity : AppCompatActivity() {
             job.complete()
         }
         job_button.text = getString(R.string.cancel)
+        job_complete_text.text = ""
     }
 
     private fun initJob() {
@@ -59,14 +60,16 @@ class JobActivity : AppCompatActivity() {
                 showToast(msg)
                 resetViews()
             } else {
-                showJobCompleteView()
+                showJobComplete()
+                initJob()
             }
         }
     }
 
-    private fun showJobCompleteView() {
+    private fun showJobComplete() {
         GlobalScope.launch(Main) {
             job_complete_text.text = getString(R.string.job_complete)
+            job_button.text = getString(R.string.start_again)
         }
     }
 
