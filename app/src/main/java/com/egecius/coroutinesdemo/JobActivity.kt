@@ -1,11 +1,13 @@
 package com.egecius.coroutinesdemo
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_job.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 
 class JobActivity : AppCompatActivity() {
 
@@ -54,14 +56,18 @@ class JobActivity : AppCompatActivity() {
         job = Job()
         job.invokeOnCompletion {
             val msg = it?.message ?: "unknown cause"
+            val name = Thread.currentThread().name
+            // invokeOnCompletion is called on the thread as the scope that the job was added to
+            Log.i("Eg:JobActivity:58", "initJob invokeOnCompletion thread name: $name")
             showToast(msg)
         }
     }
 
     private fun showToast(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        GlobalScope.launch(Main) {
+            Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
+        }
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
