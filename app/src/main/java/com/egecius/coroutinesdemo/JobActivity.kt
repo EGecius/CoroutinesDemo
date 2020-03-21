@@ -31,8 +31,6 @@ class JobActivity : AppCompatActivity() {
     }
 
     private fun initJob() {
-        job_button.text = "Start Job #1"
-        updateJobCompleteTextView("")
         job = Job()
         job.invokeOnCompletion {
             it?.message.let { msg ->
@@ -41,8 +39,14 @@ class JobActivity : AppCompatActivity() {
                 showToast(msgToPrint)
             }
         }
+        resetViews()
+    }
+
+    private fun resetViews() {
         job_progress_bar.max = PROGRESS_MAX
         job_progress_bar.progress = PROGRESS_START
+        job_button.text = "Start Job #1"
+        updateJobCompleteTextView("")
     }
 
 
