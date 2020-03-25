@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import java.lang.RuntimeException
 import java.util.concurrent.CancellationException
 
 @ExperimentalCoroutinesApi
@@ -169,5 +170,39 @@ class CoroutinesStructureDemo {
 
         assertThat(hasRunChild1).isFalse()
         assertThat(hasRunChild2).isTrue()
+    }
+
+    @Test (expected = Exception::class)
+    fun `when a child fails with exception, all children get cancelled`() = runBlockingTest {
+
+        var hasRunChild1 = false
+        var hasRunChild2 = false
+        val job = launch {
+
+            launch {
+                print("\nstarting child1:")
+                print("\ncanceling with failing exception in child1")
+                throw Exception("egis")
+
+                ensureActive()
+                print("\ncompleted child1")
+                hasRunChild1 = true
+            }
+
+            launch {
+                print("\nstarting child2:")
+                // this one has longer delay, so should not be run
+                delay(5000)
+                ensureActive()
+                hasRunChild2 = true
+                print("\ncompleted child2")
+            }
+        }
+
+        // waiting till child coroutines have finished
+        job.join()
+
+        assertThat(hasRunChild1).isFalse()
+        assertThat(hasRunChild2).isFalse()
     }
 }
