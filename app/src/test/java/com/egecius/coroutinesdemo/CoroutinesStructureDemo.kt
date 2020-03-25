@@ -141,4 +141,32 @@ class CoroutinesStructureDemo {
         assertThat(hasRunChild1).isNull()
     }
 
+    @Test
+    fun `if you cancel a child, siblings don't get cancelled`() = runBlockingTest {
+
+        var hasRunChild1 = false
+        var hasRunChild2 = false
+        launch {
+
+            launch {
+                print("\nstarting child1:")
+                print("\ncancelling child 1")
+                cancel()
+                ensureActive()
+                hasRunChild1 = true
+                print("\ncompleted child1")
+            }
+
+            launch {
+                print("\nstarting child2:")
+                // this one has longer delay, so should not be run
+                hasRunChild2 = true
+                print("\ncompleted child2")
+            }
+        }
+
+        assertThat(hasRunChild1).isFalse()
+        assertThat(hasRunChild2).isTrue()
+    }
+
 }
