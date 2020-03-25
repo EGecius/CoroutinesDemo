@@ -5,6 +5,7 @@ import com.egecius.coroutinesdemo.util.MainCoroutineRule
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -16,6 +17,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.concurrent.CancellationException
 
+@ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class AsyncAwaitActivityTest {
 
@@ -48,4 +50,15 @@ class AsyncAwaitActivityTest {
 
         assertThat(cancelMessage).isEqualTo("egis")
     }
+
+    @Test
+    fun `job's isComplete property returns true after it finishes`() = runBlockingTest {
+        val job: Job = launch {
+            delay(10)
+        }
+
+        job.join()
+        assertThat(job.isCompleted).isTrue()
+    }
+
 }
