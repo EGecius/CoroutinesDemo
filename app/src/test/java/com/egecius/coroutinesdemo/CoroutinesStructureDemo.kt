@@ -1,3 +1,5 @@
+@file:Suppress("UsePropertyAccessSyntax")
+
 package com.egecius.coroutinesdemo
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -168,5 +170,4 @@ class CoroutinesStructureDemo {
         assertThat(hasRunChild1).isFalse()
         assertThat(hasRunChild2).isTrue()
     }
-
 }
