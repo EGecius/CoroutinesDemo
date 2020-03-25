@@ -73,4 +73,24 @@ class AsyncAwaitActivityTest {
         assertThat(job.isCompleted).isTrue()
     }
 
+    @Test
+    fun `different contexts are printed for parent & child`() = runBlockingTest {
+
+        // this talk suggested that by default a new coroutine inherits parent context but logs suggest otherwise:
+        // https://youtu.be/w0kfnydnFWI?t=290
+
+        launch {
+
+            print("parent context:\n")
+            print(coroutineContext)
+
+            launch {
+
+                print(":\nchild context:\n")
+                print(coroutineContext)
+
+
+            }
+        }
+    }
 }
