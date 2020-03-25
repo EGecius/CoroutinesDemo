@@ -93,4 +93,37 @@ class CoroutinesStructureDemo {
             }
         }
     }
+
+    @Test
+    fun `cancelling parent scope cancels all children`() = runBlockingTest {
+
+        var hasRunChild1 = false
+        var hasRunChild2 = false
+        launch {
+
+            launch {
+                print("\nstarting child1:")
+                hasRunChild1 = true
+                print("\ncompleted child1")
+            }
+
+            launch {
+                print("\nstarting child2:")
+                // this one has longer delay, so should not be run
+                delay(300)
+
+                hasRunChild2 = true
+                print("\ncompleted child2")
+            }
+
+            // cancelling parent scope will cancel children that have not finished
+            delay(100)
+            print("\ncancelling parent")
+            cancel()
+        }
+
+        assertThat(hasRunChild1).isTrue()
+        assertThat(hasRunChild2).isFalse()
+    }
+
 }
