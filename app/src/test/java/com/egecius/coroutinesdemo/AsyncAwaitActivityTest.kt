@@ -61,4 +61,16 @@ class AsyncAwaitActivityTest {
         assertThat(job.isCompleted).isTrue()
     }
 
+
+    @Test
+    fun `job's isCancelled & isComplete properties returns true after it's cancelled`() = runBlockingTest {
+        val job: Job = launch {
+            delay(10)
+        }
+
+        job.cancel()
+        assertThat(job.isCancelled).isTrue()
+        assertThat(job.isCompleted).isTrue()
+    }
+
 }
