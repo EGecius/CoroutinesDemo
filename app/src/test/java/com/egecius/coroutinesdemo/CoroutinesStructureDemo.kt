@@ -205,4 +205,23 @@ class CoroutinesStructureDemo {
         assertThat(hasRunChild1).isFalse()
         assertThat(hasRunChild2).isFalse()
     }
+    
+    @Test
+    fun `cooperative cancellation is needed to finish execution`() = runBlockingTest {
+
+        var hasExecutedPastEnsureActive: Boolean
+
+        launch {
+            print("\nstarting child1:")
+            print("\ncancelling child 1")
+            cancel()
+            // you have to call ensureActive() or yield() to mark a point where cancellation will come into effect
+            yield()
+//            ensureActive()
+            hasExecutedPastEnsureActive = true
+            print("\ncompleted child1")
+
+            assertThat(hasExecutedPastEnsureActive).isFalse()
+        }
+    }
 }
