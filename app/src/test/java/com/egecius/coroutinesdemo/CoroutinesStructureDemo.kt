@@ -3,17 +3,15 @@ package com.egecius.coroutinesdemo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.egecius.coroutinesdemo.util.MainCoroutineRule
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
+import org.junit.ComparisonFailure
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.mockito.Mock
-
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.concurrent.CancellationException
 
@@ -35,10 +33,10 @@ class CoroutinesStructureDemo {
     fun setUp() {
         sut = AsyncAwaitActivity()
     }
-    
+
     @Test
     fun `job allows cancelling a coroutine`() {
-        var cancelMessage : String? = null
+        var cancelMessage: String? = null
         val job: Job = CoroutineScope(Main).launch {
             delay(10)
         }
@@ -124,6 +122,23 @@ class CoroutinesStructureDemo {
 
         assertThat(hasRunChild1).isTrue()
         assertThat(hasRunChild2).isFalse()
+    }
+
+    @Test
+    fun `values set after delay() do not persist`() = runBlockingTest {
+        var hasRunChild1: String? = null
+        launch {
+
+            launch {
+                print("\nstarting child1:")
+                delay(1)
+                hasRunChild1 = "set from child coroutine"
+                print("\ncompleted child1")
+            }
+        }
+
+        // for some weird reason if delay is called prior to a value being set, it won't be set
+        assertThat(hasRunChild1).isNull()
     }
 
 }
