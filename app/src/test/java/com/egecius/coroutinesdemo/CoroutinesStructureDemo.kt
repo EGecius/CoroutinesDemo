@@ -19,7 +19,7 @@ import java.util.concurrent.CancellationException
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
-class AsyncAwaitActivityTest {
+class CoroutinesStructureDemo {
 
     private var sut: AsyncAwaitActivity? = null
 
