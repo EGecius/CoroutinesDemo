@@ -3,6 +3,7 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -20,7 +21,6 @@ class ComposingSuspendingFunctionsTest {
             println("The answer is ${one + two}")
         }
         println("Completed in $time ms")
-
     }
 
     suspend fun doSomethingUsefulOne(): Int {
@@ -31,5 +31,16 @@ class ComposingSuspendingFunctionsTest {
     suspend fun doSomethingUsefulTwo(): Int {
         delay(200) // pretend we are doing something useful here, too
         return 29
+    }
+
+    @Test
+    fun `async-await executes concurrently`() = runBlocking {
+
+        val time = measureTimeMillis {
+            val one = async { doSomethingUsefulOne() }
+            val two = async { doSomethingUsefulTwo() }
+            println("The answer is ${one.await() + two.await()}")
+        }
+        println("Completed in $time ms")
     }
 }
