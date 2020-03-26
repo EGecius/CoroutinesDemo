@@ -21,7 +21,7 @@ class AwaitDemoTest {
     }
 
     @Test
-    fun `calling await before cancellation returns a result`() = runBlockingTest {
+    fun `calling await() before cancellation returns a result`() = runBlockingTest {
 
         val deferred: Deferred<String> = async {
             delay(10)
@@ -30,5 +30,17 @@ class AwaitDemoTest {
 
         val result = deferred.await()
         assertThat(result).isEqualTo("egis result")
+    }
+
+    @Test
+    fun `after await() returns, job-deferred is complete`() = runBlockingTest {
+
+        val deferred: Deferred<String> = async {
+            delay(10)
+            "egis result"
+        }
+
+        @Suppress("UNUSED_VARIABLE") val result = deferred.await()
+        assertThat(deferred.isCompleted).isTrue()
     }
 }
