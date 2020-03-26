@@ -1,3 +1,5 @@
+@file:Suppress("IMPLICIT_NOTHING_AS_TYPE_PARAMETER")
+
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
@@ -7,9 +9,9 @@ import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class ThrownExceptionsDemoTest {
-    
+
     @Test
-    fun `within launch() exception gets thrown immediately`() = runBlockingTest{
+    fun `within launch() exception gets thrown immediately`() = runBlockingTest {
 
         var isExceptionCaught = false
 
@@ -26,7 +28,7 @@ class ThrownExceptionsDemoTest {
     }
 
     @Test
-    fun `within async() exception gets thrown only when you call await()`() = runBlockingTest{
+    fun `within async() exception gets thrown only when you call await()`() = runBlockingTest {
 
         var isExceptionCaught = false
 
@@ -70,7 +72,7 @@ class ThrownExceptionsDemoTest {
         assertThat(isExceptionCaught).isTrue()
     }
 
-    @Test (expected = Exception::class)
+    @Test(expected = Exception::class)
     fun `non-supervisor scope does not get access to thrown exception`() = runBlockingTest {
 
         var isExceptionCaught = false
@@ -90,5 +92,21 @@ class ThrownExceptionsDemoTest {
         }
 
         assertThat(isExceptionCaught).isFalse()
+    }
+
+    @Test
+    fun `runCatching catches exceptions`() = runBlockingTest {
+
+        supervisorScope {
+
+            val deferred = async {
+                throw Exception("Egis")
+            }
+
+            val result = kotlin.runCatching {
+                deferred.await()
+            }
+            assertThat(result.isFailure).isTrue()
+        }
     }
 }
