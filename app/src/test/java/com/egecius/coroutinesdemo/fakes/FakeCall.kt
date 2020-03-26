@@ -1,5 +1,6 @@
-package com.egecius.coroutinesdemo.data
+package com.egecius.coroutinesdemo.fakes
 
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resumeWithException
 
@@ -11,8 +12,9 @@ class FakeCall {
     }
 
     fun enqueue(callBack: CallBack) {
-        callBack.onResponse()
         print("FakeCall.enqueue()")
+        // pretending that the API will respond immediately
+        callBack.onResponse()
     }
 
     interface CallBack {
@@ -22,8 +24,8 @@ class FakeCall {
 }
 
 /** An example how to convert Retrofit's standard APIs to Coroutines */
-suspend fun FakeCall.await() {
-    return suspendCancellableCoroutine { continuation ->
+suspend fun FakeCall.await() : String {
+    return suspendCancellableCoroutine { continuation : CancellableContinuation<String> ->
         continuation.invokeOnCancellation {
             cancel()
         }
@@ -31,7 +33,9 @@ suspend fun FakeCall.await() {
         enqueue(object : FakeCall.CallBack {
             override fun onResponse() {
                 print("FakeCall.onResponse")
-//                continuation.resume()
+                continuation.resume("Egis result") {
+                    print(it)
+                }
             }
 
             override fun onFailure(exception: Exception) {
