@@ -1,9 +1,6 @@
 package com.egecius.coroutinesdemo
 
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.Test
 
 class CancellationTest {
@@ -25,5 +22,15 @@ class CancellationTest {
         println("main: I'm tired of waiting! Cancelling...")
         job.cancelAndJoin() // cancels the job and waits for its completion
         println("main: Now I can quit.")
+    }
+
+    @Test (expected = TimeoutCancellationException::class)
+    fun `withTimeout() causes a TimeoutCancellationException`() = runBlocking {
+        withTimeout(1300L) {
+            repeat(1000) { i ->
+                println("I'm sleeping $i ...")
+                delay(500L)
+            }
+        }
     }
 }
