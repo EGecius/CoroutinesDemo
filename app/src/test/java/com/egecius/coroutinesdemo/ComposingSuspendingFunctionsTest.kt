@@ -2,10 +2,7 @@
 
 package com.egecius.coroutinesdemo
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.Test
 import kotlin.system.measureTimeMillis
 
@@ -43,4 +40,20 @@ class ComposingSuspendingFunctionsTest {
         }
         println("Completed in $time ms")
     }
+
+    @Test
+    fun `async-await allows lazy start`() = runBlocking {
+        val time = measureTimeMillis {
+            val one = async(start = CoroutineStart.LAZY) { doSomethingUsefulOne() }
+            val two = async(start = CoroutineStart.LAZY) { doSomethingUsefulTwo() }
+            // some computation
+            one.start() // start the first one
+            two.start() // start the second one
+
+            // if we call await() before start(), then we have sequential execution
+            println("The answer is ${one.await() + two.await()}")
+        }
+        println("Completed in $time ms")
+    }
+
 }
