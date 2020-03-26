@@ -1,4 +1,4 @@
-package com.egecius.coroutinesdemo.util
+package com.egecius.coroutinesdemo.data
 
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resumeWithException
