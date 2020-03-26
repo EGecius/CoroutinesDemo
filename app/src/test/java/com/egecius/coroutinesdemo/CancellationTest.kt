@@ -1,8 +1,11 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class CancellationTest {
 
     @Test
@@ -24,7 +27,7 @@ class CancellationTest {
         println("main: Now I can quit.")
     }
 
-    @Test (expected = TimeoutCancellationException::class)
+    @Test(expected = TimeoutCancellationException::class)
     fun `withTimeout() causes a TimeoutCancellationException`() = runBlocking {
         withTimeout(1300L) {
             repeat(1000) { i ->
@@ -32,5 +35,18 @@ class CancellationTest {
                 delay(500L)
             }
         }
+    }
+
+    @Test
+    fun `withTimeout() returns a value`() = runBlockingTest {
+        val myValue: String = withTimeout(1000) {
+            repeat(3) { i ->
+                println("I'm sleeping $i ...")
+                delay(10L)
+            }
+            "egis"
+        }
+
+        assertThat(myValue).isEqualTo("egis")
     }
 }
