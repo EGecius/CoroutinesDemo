@@ -3,7 +3,6 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import kotlin.system.measureTimeMillis
@@ -70,4 +69,28 @@ class ComposingSuspendingFunctionsTest {
         doSomethingUsefulOne()
     }
 
+    @Test
+    fun `failure is always propagated through coroutines hierarchy`() = runBlocking<Unit> {
+        try {
+            failedConcurrentSum()
+        } catch (e: ArithmeticException) {
+            println("Computation failed with ArithmeticException")
+        }
+    }
+
+    suspend fun failedConcurrentSum(): Int = coroutineScope {
+        val one = async {
+            try {
+                delay(Long.MAX_VALUE) // Emulates very long computation
+                42
+            } finally {
+                println("First child was cancelled")
+            }
+        }
+        val two = async<Int> {
+            println("Second child throws an exception")
+            throw ArithmeticException()
+        }
+        one.await() + two.await()
+    }
 }
