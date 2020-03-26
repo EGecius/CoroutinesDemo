@@ -3,6 +3,8 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import kotlin.system.measureTimeMillis
 
@@ -54,6 +56,18 @@ class ComposingSuspendingFunctionsTest {
             println("The answer is ${one.await() + two.await()}")
         }
         println("Completed in $time ms")
+    }
+
+    @Test
+    fun `you can turn a suspending function into a normal one with async`() = runBlocking {
+        val deferred = somethingUsefulOneAsync()
+        val result: Int = deferred.await()
+        assertThat(result).isEqualTo(13)
+        println("result: $result")
+    }
+
+    fun somethingUsefulOneAsync() = GlobalScope.async {
+        doSomethingUsefulOne()
     }
 
 }
