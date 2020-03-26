@@ -21,6 +21,7 @@ class FakeCall {
     }
 }
 
+/** An example how to convert Retrofit's standard APIs to Coroutines */
 suspend fun FakeCall.await() {
     return suspendCancellableCoroutine { continuation ->
         continuation.invokeOnCancellation {
