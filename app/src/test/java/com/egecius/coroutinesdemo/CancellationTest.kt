@@ -39,7 +39,7 @@ class CancellationTest {
 
     @Test
     fun `withTimeout() returns a value`() = runBlockingTest {
-        val myValue: String = withTimeout(1000) {
+        val result: String = withTimeout(1000) {
             repeat(3) { i ->
                 println("I'm sleeping $i ...")
                 delay(10L)
@@ -47,6 +47,18 @@ class CancellationTest {
             "egis"
         }
 
-        assertThat(myValue).isEqualTo("egis")
+        assertThat(result).isEqualTo("egis")
+    }
+
+    @Test
+    fun `withTimeoutOrNull() does not throw a TimeoutCancellationException`() = runBlockingTest {
+        val result = withTimeoutOrNull(100) {
+            repeat(1000) { i ->
+                println("I'm sleeping $i ...")
+                delay(40)
+            }
+        }
+
+        assertThat(result).isNull()
     }
 }
