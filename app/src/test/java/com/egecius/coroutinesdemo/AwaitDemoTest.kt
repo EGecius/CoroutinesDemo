@@ -8,7 +8,22 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class AwaitDemoTest {
 
-    @Test (expected = CancellationException::class)
+    @Test
+    fun `async block gets executed before await() is called`() = runBlockingTest {
+
+        var isAsyncExecuted = false
+        val deferred = async {
+            println("executing async")
+            isAsyncExecuted = true
+        }
+
+        println("avoiding calling await")
+//        deferred.await()
+
+        assertThat(isAsyncExecuted).isTrue()
+    }
+
+    @Test(expected = CancellationException::class)
     fun `calling await() after job is cancelled fails with exception because there is nothing to return`() = runBlockingTest {
 
         val deferred: Deferred<String> = async {
