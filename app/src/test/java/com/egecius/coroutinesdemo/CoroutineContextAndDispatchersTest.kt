@@ -1,8 +1,9 @@
 package com.egecius.coroutinesdemo
 
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class CoroutineContextAndDispatchersTest {
@@ -14,6 +15,18 @@ class CoroutineContextAndDispatchersTest {
             val name = Thread.currentThread().name
             // since runBlocking runs on main thread, main thread will be printed
             print(name)
+            assertThat(name).contains("main")
+        }
+        Unit
+    }
+
+    @Test
+    fun `coroutine started with its own IO dispatcher does not inherit a dispatcher from parent`() = runBlocking {
+        launch(IO) {
+            val name = Thread.currentThread().name
+            // since runBlocking runs on main thread, main thread will be printed
+            print(name)
+            assertThat(name).contains("worker")
         }
         Unit
     }
