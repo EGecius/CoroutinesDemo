@@ -69,4 +69,26 @@ class ThrownExceptionsDemoTest {
 
         assertThat(isExceptionCaught).isTrue()
     }
+
+    @Test (expected = Exception::class)
+    fun `non-supervisor scope does not get access to thrown exception`() = runBlockingTest {
+
+        var isExceptionCaught = false
+
+        coroutineScope {
+
+            val deferred = async {
+                throw Exception("Egis")
+            }
+
+            try {
+                deferred.await()
+            } catch (e: Exception) {
+                isExceptionCaught = true
+                println("my exception caught: $e")
+            }
+        }
+
+        assertThat(isExceptionCaught).isFalse()
+    }
 }
