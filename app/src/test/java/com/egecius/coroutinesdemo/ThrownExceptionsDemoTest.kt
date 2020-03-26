@@ -1,9 +1,6 @@
 package com.egecius.coroutinesdemo
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
@@ -46,6 +43,28 @@ class ThrownExceptionsDemoTest {
         } catch (exception: Exception) {
             print("exception caught in my try/catch block:: $exception")
             isExceptionCaught = true
+        }
+
+        assertThat(isExceptionCaught).isTrue()
+    }
+
+    @Test
+    fun `only supervisor scope gets access to thrown exception`() = runBlockingTest {
+
+        var isExceptionCaught = false
+
+        supervisorScope {
+
+            val deferred = async {
+                throw Exception("Egis")
+            }
+
+            try {
+                deferred.await()
+            } catch (e: Exception) {
+                isExceptionCaught = true
+                println("my exception caught: $e")
+            }
         }
 
         assertThat(isExceptionCaught).isTrue()
