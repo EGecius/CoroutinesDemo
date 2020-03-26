@@ -2,6 +2,7 @@ package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
@@ -17,5 +18,17 @@ class AwaitDemoTest {
 
         deferred.cancel()
         deferred.await()
+    }
+
+    @Test
+    fun `calling await before cancellation returns a result`() = runBlockingTest {
+
+        val deferred: Deferred<String> = async {
+            delay(10)
+            "egis result"
+        }
+
+        val result = deferred.await()
+        assertThat(result).isEqualTo("egis result")
     }
 }
