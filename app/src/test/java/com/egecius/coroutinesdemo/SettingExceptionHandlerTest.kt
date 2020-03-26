@@ -28,4 +28,22 @@ class SettingExceptionHandlerTest {
         // for some reason variable does not get set, even though the line is executed
 //        assertThat(isExceptionCaught).isTrue()
     }
+
+    @Test
+    fun `leaving outer coroutine without a handler propagates the crash without catching it`() = runBlockingTest {
+
+        val handler = CoroutineExceptionHandler { _, throwable ->
+            // this will not get executed
+            println("I caught with exception handler: $throwable")
+        }
+
+        val scope = CoroutineScope(Job())
+
+        // if we leave the outer 'launch' without a handler, it gets propagated - exception is never caught
+        scope.launch {
+            launch(handler) {
+                throw Exception("Egis")
+            }
+        }
+    }
 }
