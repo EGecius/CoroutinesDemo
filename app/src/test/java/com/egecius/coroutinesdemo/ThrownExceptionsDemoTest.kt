@@ -1,6 +1,7 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
@@ -27,4 +28,26 @@ class ThrownExceptionsDemoTest {
         assertThat(isExceptionCaught).isTrue()
     }
 
+    @Test
+    fun `within async() exception gets thrown only when you call await()`() = runBlockingTest{
+
+        var isExceptionCaught = false
+
+        val deferred = async {
+            throw Exception("egis")
+        }
+
+        assertThat(isExceptionCaught).isFalse()
+        // only now exception will be thrown
+        println("calling await()")
+
+        try {
+            deferred.await()
+        } catch (exception: Exception) {
+            print("exception caught in my try/catch block:: $exception")
+            isExceptionCaught = true
+        }
+
+        assertThat(isExceptionCaught).isTrue()
+    }
 }
