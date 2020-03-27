@@ -54,6 +54,7 @@ class CoroutineContextAndDispatchersTest {
         launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
             println("Unconfined      : I'm working in thread ${Thread.currentThread().name}")
             delay(50)
+            // now  unconfined one resumes in the default executor thread that the delay function is using
             println("Unconfined      : After delay in thread ${Thread.currentThread().name}")
         }
         launch { // context of the parent, main runBlocking coroutine
@@ -62,4 +63,5 @@ class CoroutineContextAndDispatchersTest {
             println("main runBlocking: After delay in thread ${Thread.currentThread().name}")
         }
     }
+
 }
