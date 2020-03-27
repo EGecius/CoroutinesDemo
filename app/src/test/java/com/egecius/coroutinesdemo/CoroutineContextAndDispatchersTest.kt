@@ -146,6 +146,15 @@ class CoroutineContextAndDispatchersTest {
     }
 
     @Test
+    fun `print coroutine name`() = runBlocking<Unit> {
+        launch(CoroutineName("egis-name")) {
+            val coroutineName: CoroutineName? = coroutineContext[CoroutineName]
+            println(coroutineName)
+            assertThat(coroutineName!!.name).isEqualTo("egis-name")
+        }
+    }
+
+    @Test
     fun `it's useful to give names to coroutines for debugging`() = runBlocking {
         log("Started main coroutine")
         // run two background value computations
