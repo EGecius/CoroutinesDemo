@@ -6,6 +6,6 @@ import kotlinx.coroutines.Job
 fun CoroutineScope.log(msg: String) {
     val threadName = Thread.currentThread().name
     val job = println(coroutineContext[Job])
-    val fullMsg = "$threadName, $job: + $msg"
+    val fullMsg = "thread: $threadName; job: $job, msg: $msg"
     println(fullMsg)
 }
