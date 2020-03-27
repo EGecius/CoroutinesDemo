@@ -1,5 +1,6 @@
 package com.egecius.coroutinesdemo
 
+import com.egecius.coroutinesdemo.util.log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.test.runBlockingTest
@@ -80,5 +81,20 @@ class CoroutineContextAndDispatchersTest {
             2
         }
         println("Main: The answer is ${a.await() * b.await() * c.await()} in $coroutineContext")
+    }
+
+    @Test
+    fun `withContext() changes context but keeps you in the same coroutine`() = runBlocking {
+        newSingleThreadContext("Ctx1").use { ctx1 ->
+            newSingleThreadContext("Ctx2").use { ctx2 ->
+                runBlocking(ctx1) {
+                    log("Started in ctx1")
+                    withContext(ctx2) {
+                        log("Working in ctx2")
+                    }
+                    log("Back to ctx1")
+                }
+            }
+        }
     }
 }
