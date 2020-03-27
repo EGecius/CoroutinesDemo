@@ -1,13 +1,14 @@
 package com.egecius.coroutinesdemo
 
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class CoroutineContextAndDispatchersTest {
-    
+
     @Test
     fun `coroutine inherits context, including dispatcher, from the scope it's launched from`() = runBlocking {
 
@@ -29,5 +30,21 @@ class CoroutineContextAndDispatchersTest {
             assertThat(name).contains("worker")
         }
         Unit
+    }
+
+    @Test
+    fun `you can run in your own thread`() = runBlockingTest {
+        @Suppress("EXPERIMENTAL_API_USAGE")
+        // A dedicated thread is a very expensive resource, so would have to be used with special care
+        launch(newSingleThreadContext("MyOwnThread")) { // will get its own new thread
+            println("newSingleThreadContext: I'm working in thread ${Thread.currentThread().name}")
+        }
+    }
+
+    @Test
+    fun `you can run in unconfined Dispatcher`() = runBlockingTest {
+        launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
+            println("Unconfined            : I'm working in thread ${Thread.currentThread().name}")
+        }
     }
 }
