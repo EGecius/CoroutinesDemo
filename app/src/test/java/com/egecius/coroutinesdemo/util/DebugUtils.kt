@@ -1,5 +1,6 @@
 package com.egecius.coroutinesdemo.util
 
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 

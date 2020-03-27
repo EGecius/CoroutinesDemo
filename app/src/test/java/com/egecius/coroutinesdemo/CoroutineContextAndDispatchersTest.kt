@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import kotlin.coroutines.CoroutineContext
 
 @ExperimentalCoroutinesApi
 class CoroutineContextAndDispatchersTest {
@@ -169,5 +170,16 @@ class CoroutineContextAndDispatchersTest {
             6
         }
         log("The answer for v1 / v2 = ${v1.await() / v2.await()}")
+    }
+
+    @Test
+    fun `you can pass multiple context elements at the same time`() = runBlocking<Unit> {
+        val context: CoroutineContext = Dispatchers.Default + CoroutineName("egis-test")
+        println("context: $context")
+        launch(context) {
+            val threadName = Thread.currentThread().name
+            println("thread: $threadName")
+            assertThat(threadName).contains("egis-test")
+        }
     }
 }
