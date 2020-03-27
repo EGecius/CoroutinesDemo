@@ -2,6 +2,7 @@ package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.NonCancellable.join
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
@@ -45,6 +46,20 @@ class CoroutineContextAndDispatchersTest {
     fun `you can run in unconfined Dispatcher`() = runBlockingTest {
         launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
             println("Unconfined            : I'm working in thread ${Thread.currentThread().name}")
+        }
+    }
+
+    @Test
+    fun `unconfined coroutines are fully determined by the caller thread`() = runBlocking<Unit>{
+        launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
+            println("Unconfined      : I'm working in thread ${Thread.currentThread().name}")
+            delay(50)
+            println("Unconfined      : After delay in thread ${Thread.currentThread().name}")
+        }
+        launch { // context of the parent, main runBlocking coroutine
+            println("main runBlocking: I'm working in thread ${Thread.currentThread().name}")
+            delay(200)
+            println("main runBlocking: After delay in thread ${Thread.currentThread().name}")
         }
     }
 }
