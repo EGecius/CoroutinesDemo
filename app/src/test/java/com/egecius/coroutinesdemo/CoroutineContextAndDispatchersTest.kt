@@ -87,6 +87,7 @@ class CoroutineContextAndDispatchersTest {
     fun `withContext() changes context but keeps you in the same coroutine`() = runBlocking {
         newSingleThreadContext("Ctx1").use { ctx1 ->
             newSingleThreadContext("Ctx2").use { ctx2 ->
+
                 runBlocking(ctx1) {
                     log("Started in ctx1")
                     withContext(ctx2) {
@@ -97,4 +98,10 @@ class CoroutineContextAndDispatchersTest {
             }
         }
     }
+
+    @Test
+    fun `you can print coroutine job`() = runBlocking{
+        println("My job is ${coroutineContext[Job]}")
+    }
+
 }
