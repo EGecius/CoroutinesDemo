@@ -144,4 +144,21 @@ class CoroutineContextAndDispatchersTest {
         request.join() // wait for completion of the request, including all its children
         println("Now processing of the request is complete")
     }
+
+    @Test
+    fun `it's useful to give names to coroutines for debugging`() = runBlocking {
+        log("Started main coroutine")
+        // run two background value computations
+        val v1 = async(CoroutineName("v1coroutine")) {
+            delay(500)
+            log("Computing v1")
+            252
+        }
+        val v2 = async(CoroutineName("v2coroutine")) {
+            delay(1000)
+            log("Computing v2")
+            6
+        }
+        log("The answer for v1 / v2 = ${v1.await() / v2.await()}")
+    }
 }
