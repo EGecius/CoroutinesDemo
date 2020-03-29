@@ -17,4 +17,8 @@ class MyViewModel : ViewModel() {
         return fakeRepo.fetchItem()
     }
 
+    /** This shows how LiveData delegates to another LiveData */
+    val resultFromSoruce: LiveData<FakeItem> = selectedItemId.switchMap {
+        liveData { emitSource(fakeRepo.getLiveData()) }
+    }
 }
