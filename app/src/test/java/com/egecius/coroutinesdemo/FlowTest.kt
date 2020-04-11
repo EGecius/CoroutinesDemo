@@ -31,10 +31,8 @@ class FlowTest {
     @Test
     fun `show how create a flow`() = runBlockingTest {
 
-        fun foo(): Flow<Int> = flow { // flow builder
+        val myFlow = flow { // flow builder
             for (i in 1..3) {
-                println("flow thread: ${Thread.currentThread().name}")
-                delay(100) // pretend we are doing something useful here
                 emit(i) // emit next value
             }
         }
@@ -47,7 +45,7 @@ class FlowTest {
             }
         }
         // Collect the flow
-        foo().collect(object : FlowCollector<Int> {
+        myFlow.collect(object : FlowCollector<Int> {
             override suspend fun emit(value: Int) {
                 println("result: $value")
             }
