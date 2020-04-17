@@ -125,4 +125,24 @@ class FlowTest {
             }
             .collect { value -> println(value) }
     }
+
+    @Test
+    fun `take cancels the execution of the flow when the corresponding limit is reached`() = runBlockingTest {
+        val numbers: Flow<Int> = flow {
+            try {
+                emit(1)
+                emit(2)
+                println("This line will not execute")
+                emit(3)
+            } catch (e: Exception) {
+                println("exception: $e")
+            } finally {
+                println("Finally in numbers")
+            }
+        }
+
+        numbers
+            .take(2) // take only the first two
+            .collect { value -> println(value) }
+    }
 }
