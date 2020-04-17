@@ -34,4 +34,19 @@ class FlowCompletionTest {
             .catch { cause -> println("Caught exception") }
             .collect { value -> println(value) }
     }
+
+    @Test
+    fun `just like the catch operator, onCompletion only sees exceptions coming from upstream`() = runBlocking {
+
+        val flow: Flow<Int> = (1..3).asFlow().onEach {
+            throw IllegalStateException()
+        }
+
+        flow
+            .onCompletion { cause -> println("Flow completed with $cause") }
+            .collect { value ->
+                check(value <= 1) { "Collected $value" }
+                println(value)
+            }
+    }
 } 
