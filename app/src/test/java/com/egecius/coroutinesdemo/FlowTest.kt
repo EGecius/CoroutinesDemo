@@ -255,4 +255,25 @@ class FlowTest {
         }
         println("Collected in $time ms")
     }
+
+    @Test
+    fun `collectLatest() cancels a slow collector and restarts it every time a new value is emitted`() = runBlocking {
+
+        val myFlow = flow {
+            for (i in 1..2) {
+                delay(100) // pretend we are asynchronously waiting 100 ms
+                emit(i)
+            }
+        }
+
+        val time = measureTimeMillis {
+            myFlow
+                .collectLatest { value -> // cancel & restart on the latest value
+                    println("Collecting $value")
+                    delay(300) // pretend we are processing it for 300 ms
+                    println("Done $value")
+                }
+        }
+        println("Collected in $time ms")
+    }
 }
