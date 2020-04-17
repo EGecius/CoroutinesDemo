@@ -3,6 +3,7 @@ package com.egecius.coroutinesdemo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
@@ -144,5 +145,16 @@ class FlowTest {
         numbers
             .take(2) // take only the first two
             .collect { value -> println(value) }
+    }
+
+    @Test
+    fun `reduce operator allows accumulate all collected values`() = runBlockingTest {
+
+        val sum = (1..3).asFlow()
+            .map { it * it } // squares of numbers from 1 to 3
+            .reduce { accumulator, value -> accumulator + value } // sum them (terminal operator)
+
+        println(sum)
+        assertThat(sum).isEqualTo(14) // 1 + 4 + 9 = 14
     }
 }
