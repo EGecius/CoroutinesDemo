@@ -100,4 +100,16 @@ class FlowTest {
         // will print 1, 2, 3
         (1..3).asFlow().collect { println(it) }
     }
+    
+    @Test
+    fun `flows can call intermediate operators`() = runBlockingTest {
+        (1..3).asFlow() // a flow of requests
+            .map { request -> performRequest(request) }
+            .collect { response -> println(response) }
+    }
+
+    private suspend fun performRequest(request: Int): String {
+        delay(100) // imitate long-running asynchronous work
+        return "response $request"
+    }
 }
