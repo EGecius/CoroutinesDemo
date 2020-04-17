@@ -143,7 +143,7 @@ class FlowTest {
         }
 
         numbers
-            .take(2) // take only the first two
+            .take(2) // take only the first two values
             .collect { value -> println(value) }
     }
 
@@ -166,5 +166,15 @@ class FlowTest {
 
         println(result)
         assertThat(result).isEqualTo(listOf(1, 4, 9))
+    }
+
+    @Test
+    fun `first() operator takes only the first value`() = runBlockingTest {
+        val result = (1..3).asFlow()
+            .map { it * it }
+            .first()
+
+        println(result)
+        assertThat(result).isEqualTo(1)
     }
 }
