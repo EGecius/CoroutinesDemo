@@ -32,4 +32,25 @@ class ChannelsTest {
         println("Done!") // we are done
         coroutineContext.cancelChildren() // cancel children coroutines
     }
+
+    @Test
+    fun `produce a stream of prime number using pipes`() = runBlocking {
+
+        var currentChannel: ReceiveChannel<Int> = numbersFrom(2)
+        repeat(10) {
+            val prime: Int = currentChannel.receive()
+            println(prime)
+            currentChannel = filter(currentChannel, prime)
+        }
+        coroutineContext.cancelChildren() // cancel all children to let main finish
+    }
+
+    private fun CoroutineScope.numbersFrom(start: Int) = produce<Int> {
+        var x = start
+        while (true) send(x++) // infinite stream of integers from start
+    }
+
+    private fun CoroutineScope.filter(numbersChannel: ReceiveChannel<Int>, prime: Int) = produce<Int> {
+        for (x in numbersChannel) if (x % prime != 0) send(x)
+    }
 }
