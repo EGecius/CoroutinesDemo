@@ -51,4 +51,29 @@ class FlowTest {
             }
         })
     }
+
+    @Test
+    fun `flows are cold - execution does not start until collect() is called`() = runBlockingTest {
+
+        val myFlow = flow {
+            println("Flow started")
+            for (i in 1..3) {
+                delay(100)
+                emit(i)
+            }
+        }
+
+        println("Calling collect...")
+        myFlow.collect(object : FlowCollector<Int> {
+            override suspend fun emit(value: Int) {
+                println(value)
+            }
+        })
+        println("Calling collect again...")
+        myFlow.collect(object : FlowCollector<Int> {
+            override suspend fun emit(value: Int) {
+                println(value)
+            }
+        })
+    }
 }
