@@ -1,12 +1,9 @@
 package com.egecius.coroutinesdemo
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 
@@ -75,5 +72,27 @@ class FlowTest {
                 println(value)
             }
         })
+    }
+
+    @Test
+    fun `flows get cancelled with the same rules as coroutines`() = runBlockingTest {
+
+        fun foo(): Flow<Int> = flow {
+            for (i in 1..3) {
+                delay(100)
+                // here 3rd item won't get emitted - flow will get cancelled by coroutine 'withTimeoutOrNull()' bellow
+                println("Emitting $i")
+                emit(i)
+            }
+        }
+
+        withTimeoutOrNull(250) { // Timeout after 250ms
+            foo().collect(object : FlowCollector<Int> {
+                override suspend fun emit(value: Int) {
+                    println(value)
+                }
+            })
+        }
+        println("Done")
     }
 }
