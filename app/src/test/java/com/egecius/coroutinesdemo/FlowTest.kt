@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import kotlin.system.measureTimeMillis
 
 @Suppress("BlockingMethodInNonBlockingContext")
 @ExperimentalCoroutinesApi
@@ -209,5 +210,28 @@ class FlowTest {
         myFlow.collect { value ->
             log("Collected $value")
         }
+    }
+
+    @Test
+    fun `buffer operator keeps Flow executing without waiting for collection to finish`() = runBlocking {
+
+        val myFlow = flow {
+            for (i in 1..3) {
+                delay(100) // pretend we are asynchronously waiting 100 ms
+                emit(i)
+            }
+        }
+
+        val time = measureTimeMillis {
+            myFlow
+                .buffer()
+                .collect { value ->
+                    delay(200) // pretend we are processing it for 300 ms
+                    println(value)
+                }
+        }
+        // without buffer it takes 900ms = 3*100ms + 3*300ms
+        // with buffer it takes 700ms = 1*100ms + 3*200ms
+        println("Collected in $time ms")
     }
 }
