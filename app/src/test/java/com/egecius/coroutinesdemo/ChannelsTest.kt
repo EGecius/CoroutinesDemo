@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class CoroutinesTest {
+class ChannelsTest {
 
     /** Produces infinite stream */
     private fun CoroutineScope.produceNumbers() = produce {
