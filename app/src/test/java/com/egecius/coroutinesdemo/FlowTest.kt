@@ -1,11 +1,13 @@
 package com.egecius.coroutinesdemo
 
+import com.egecius.coroutinesdemo.util.log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
+@Suppress("BlockingMethodInNonBlockingContext")
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class FlowTest {
@@ -192,5 +194,20 @@ class FlowTest {
             }.collect {
                 println("Collect $it")
             }
+    }
+
+    @Test
+    fun `to have Flow executed on background thread but values emitted on the main thread use 'flowOn()'`() = runBlocking {
+        val myFlow = flow {
+            for (i in 1..3) {
+                Thread.sleep(100) // pretend we are computing it in CPU-consuming way
+                log("Emitting $i")
+                emit(i) // emit next value
+            }
+        }.flowOn(Dispatchers.Default) // RIGHT way to change context for CPU-consuming code in flow builder
+
+        myFlow.collect { value ->
+            log("Collected $value")
+        }
     }
 }
