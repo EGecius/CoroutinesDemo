@@ -177,4 +177,20 @@ class FlowTest {
         println(result)
         assertThat(result).isEqualTo(1)
     }
+
+    @Test
+    fun `flows are sequential`() = runBlockingTest {
+        // execution of the next value does not start until execution of the one before is complete.
+        (1..3).asFlow()
+            .filter {
+                println("Filter $it")
+                it % 2 == 0
+            }
+            .map {
+                println("Map $it")
+                "string $it"
+            }.collect {
+                println("Collect $it")
+            }
+    }
 }
