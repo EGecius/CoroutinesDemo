@@ -1,10 +1,7 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -23,5 +20,18 @@ class FlowCompletionTest {
         flow
             .onCompletion { println("Done") }
             .collect { println("collecting $it") }
+    }
+
+    @Test
+    fun `onCompletion operator also receives a Throwable`() = runBlocking {
+        val flow: Flow<Int> = flow {
+            emit(1)
+            throw RuntimeException()
+        }
+
+        flow
+            .onCompletion { cause -> if (cause != null) println("Flow completed exceptionally") }
+            .catch { cause -> println("Caught exception") }
+            .collect { value -> println(value) }
     }
 } 
