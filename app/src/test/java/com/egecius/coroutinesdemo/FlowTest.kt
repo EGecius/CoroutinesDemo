@@ -1,10 +1,7 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 
@@ -96,5 +93,11 @@ class FlowTest {
             // will print 1, 2, 3
             println(it)
         }
+    }
+
+    @Test
+    fun `asFlow() is a simple flow builder`() = runBlockingTest {
+        // will print 1, 2, 3
+        (1..3).asFlow().collect { println(it) }
     }
 }
