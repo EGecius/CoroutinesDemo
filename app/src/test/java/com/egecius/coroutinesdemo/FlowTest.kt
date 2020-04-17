@@ -234,4 +234,25 @@ class FlowTest {
         // with buffer it takes 700ms = 1*100ms + 3*200ms
         println("Collected in $time ms")
     }
+
+    @Test
+    fun `conflate() collects only most recent values, when collection is slow`() = runBlocking {
+        val myFlow = flow {
+            for (i in 1..3) {
+                delay(100) // pretend we are asynchronously waiting 100 ms
+                emit(i)
+            }
+        }
+
+        val time = measureTimeMillis {
+            myFlow
+                .conflate() // conflate emissions, don't process each one
+                .collect { value ->
+                    delay(300) // pretend we are processing it for 300 ms
+                    // value 2 will be skipped because collect() is too slow -- value 3 before collect() is finished
+                    println(value)
+                }
+        }
+        println("Collected in $time ms")
+    }
 }
