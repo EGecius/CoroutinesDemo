@@ -284,4 +284,16 @@ class FlowTest {
         numbersFlow.zip(stringsFlow) { a, b -> "$a -> $b" } // compose a single string
             .collect { println(it) }
     }
+
+    @Test
+    fun `combine() operator uses latest values, like RxJava's combineLatest`() = runBlocking {
+
+        val numbersFlow = (1..3).asFlow().onEach { delay(30) } // numbers 1..3 every 300 ms
+        val stringsFlow = flowOf("one", "two", "three").onEach { delay(40) } // strings every 400 ms
+        val startTime = System.currentTimeMillis() // remember the start time
+        numbersFlow.combine(stringsFlow) { a, b -> "$a -> $b" } // compose a single string with "combine"
+            .collect { value -> // collect and print
+                println("$value at ${System.currentTimeMillis() - startTime} ms from start")
+            }
+    }
 }
