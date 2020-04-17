@@ -1,11 +1,8 @@
 package com.egecius.coroutinesdemo
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
@@ -52,5 +49,27 @@ class ChannelsTest {
 
     private fun CoroutineScope.filter(numbersChannel: ReceiveChannel<Int>, prime: Int) = produce<Int> {
         for (x in numbersChannel) if (x % prime != 0) send(x)
+    }
+    
+    @Test
+    fun `multiple coroutines may receive from the same channel`() = runBlocking {
+        val producer = produceNumbersWithDelay()
+        repeat(5) { launchProcessor(it, producer) }
+        delay(950)
+        producer.cancel() // cancel producer coroutine and thus kill them all
+    }
+
+    private fun CoroutineScope.produceNumbersWithDelay() = produce {
+        var x = 1 // start from 1
+        while (true) {
+            send(x++) // produce next
+            delay(100) // wait 0.1s
+        }
+    }
+
+    private fun CoroutineScope.launchProcessor(id: Int, channel: ReceiveChannel<Int>) = launch {
+        for (msg in channel) {
+            println("Processor #$id received $msg")
+        }
     }
 }
