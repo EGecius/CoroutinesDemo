@@ -157,4 +157,14 @@ class FlowTest {
         println(sum)
         assertThat(sum).isEqualTo(14) // 1 + 4 + 9 = 14
     }
+
+    @Test
+    fun `toList() operator adds all values to a list`() = runBlockingTest {
+        val result = (1..3).asFlow()
+            .map { it * it }
+            .toList()
+
+        println(result)
+        assertThat(result).isEqualTo(listOf(1, 4, 9))
+    }
 }
