@@ -276,4 +276,12 @@ class FlowTest {
         }
         println("Collected in $time ms")
     }
+
+    @Test
+    fun ` zip operator that combines the corresponding values of two flows`() = runBlocking {
+        val numbersFlow = (1..3).asFlow()
+        val stringsFlow = flowOf("one", "two", "three")
+        numbersFlow.zip(stringsFlow) { a, b -> "$a -> $b" } // compose a single string
+            .collect { println(it) }
+    }
 }
