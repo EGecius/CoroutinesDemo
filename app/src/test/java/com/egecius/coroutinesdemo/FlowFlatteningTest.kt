@@ -19,14 +19,14 @@ class FlowFlatteningTest {
     @Test
     fun `flatMapConcat allows mapping Flow to another Flow`() = runBlocking {
         // without flattening you get Flow of Flows
-        val map: Flow<Flow<String>> = (1..3).asFlow()
+        val flow: Flow<Flow<String>> = (1..3).asFlow()
             .map { requestFlow(it) }
 
         // with flatMapConcat we avoid it
-        val map2: Flow<String> = (1..3).asFlow()
+        val flow2: Flow<String> = (1..3).asFlow()
             .flatMapConcat { requestFlow(it) }
 
-        map2.collect {
+        flow2.collect {
             println(it)
         }
     }
