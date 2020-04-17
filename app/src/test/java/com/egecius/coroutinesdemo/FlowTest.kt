@@ -1,7 +1,10 @@
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 
@@ -40,11 +43,9 @@ class FlowTest {
             }
         }
         // Collect the flow
-        myFlow.collect(object : FlowCollector<Int> {
-            override suspend fun emit(value: Int) {
-                println("result: $value")
-            }
-        })
+        myFlow.collect {
+            println("result: $it")
+        }
     }
 
     @Test
@@ -59,17 +60,14 @@ class FlowTest {
         }
 
         println("Calling collect...")
-        myFlow.collect(object : FlowCollector<Int> {
-            override suspend fun emit(value: Int) {
-                println(value)
-            }
-        })
+        myFlow.collect {
+            println(it)
+
+        }
         println("Calling collect again...")
-        myFlow.collect(object : FlowCollector<Int> {
-            override suspend fun emit(value: Int) {
-                println(value)
-            }
-        })
+        myFlow.collect {
+            println(it)
+        }
     }
 
     @Test
@@ -84,11 +82,9 @@ class FlowTest {
         }
 
         withTimeoutOrNull(250) { // Timeout after 250ms
-            foo().collect(object : FlowCollector<Int> {
-                override suspend fun emit(value: Int) {
-                    println(value)
-                }
-            })
+            foo().collect {
+                println(it)
+            }
         }
         println("Done")
     }
