@@ -100,7 +100,7 @@ class FlowTest {
         // will print 1, 2, 3
         (1..3).asFlow().collect { println(it) }
     }
-    
+
     @Test
     fun `flows can call intermediate operators`() = runBlockingTest {
         (1..3).asFlow() // a flow of requests
@@ -111,5 +111,18 @@ class FlowTest {
     private suspend fun performRequest(request: Int): String {
         delay(100) // imitate long-running asynchronous work
         return "response $request"
+    }
+
+    @Test
+    fun `transform() operator allows emitting multiple times & multiple types in a single block`() = runBlockingTest {
+        (1..3).asFlow() // a flow of requests
+            .transform {
+                // can emit multiple times and multiple types in a block
+                val request: Int = it
+                emit(request)
+                val result: String = performRequest(request)
+                emit(result)
+            }
+            .collect { value -> println(value) }
     }
 }
