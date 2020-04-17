@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
+@FlowPreview
 class FlowFlatteningTest {
 
     private fun requestFlow(i: Int): Flow<String> = flow {
@@ -15,7 +16,6 @@ class FlowFlatteningTest {
     }
 
     @Suppress("UNUSED_VARIABLE")
-    @OptIn(FlowPreview::class)
     @Test
     fun `flatMapConcat allows mapping Flow to another Flow`() = runBlocking {
         // without flattening you get Flow of Flows
@@ -27,6 +27,16 @@ class FlowFlatteningTest {
             .flatMapConcat { requestFlow(it) }
 
         map2.collect {
+            println(it)
+        }
+    }
+
+    @Test
+    fun `flatMapMerge does not wait for inner Flow to complete`() = runBlocking {
+        val flow: Flow<String> = (1..3).asFlow()
+            .flatMapMerge { requestFlow(it) }
+
+        flow.collect {
             println(it)
         }
     }
