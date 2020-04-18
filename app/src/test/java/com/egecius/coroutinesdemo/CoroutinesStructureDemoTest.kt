@@ -36,33 +36,6 @@ class CoroutinesStructureDemoTest {
         sut = AsyncAwaitActivity()
     }
 
-    @Test
-    fun `invokeOnCompletion receives exception thrown`() {
-        var resultThrowable: Throwable? = null
-        CoroutineScope(Main).launch {
-            throw UnknownHostException("egis")
-        }.invokeOnCompletion {
-            resultThrowable = it
-        }
-
-        assertThat(resultThrowable?.message).isEqualTo("egis")
-        assertThat(resultThrowable is UnknownHostException).isTrue()
-    }
-
-    @Test
-    fun `job allows cancelling a coroutine`() {
-        var cancelMessage: String? = null
-        val job: Job = CoroutineScope(Main).launch {
-            delay(10)
-        }
-        job.invokeOnCompletion {
-            cancelMessage = it?.message
-        }
-
-        job.cancel(CancellationException("egis"))
-
-        assertThat(cancelMessage).isEqualTo("egis")
-    }
 
     @Test
     fun `job's isComplete property returns true after it finishes`() = runBlockingTest {
