@@ -2,6 +2,7 @@
 
 package com.egecius.coroutinesdemo
 
+import androidx.lifecycle.viewModelScope
 import com.egecius.coroutinesdemo.util.MainCoroutineRule
 import kotlinx.coroutines.*
 import org.assertj.core.api.Assertions.assertThat
@@ -46,4 +47,16 @@ class CoroutineExceptionsTest {
         assertThat(cancelMessage).isEqualTo("egis")
     }
 
+    @Test
+    fun `viewModelScope job intercepts exception`() {
+        var resultThrowable: Throwable? = null
+
+        MyViewModel().viewModelScope.launch{
+            throw Exception("egis")
+        }.invokeOnCompletion {
+            resultThrowable = it
+        }
+
+        assertThat(resultThrowable?.message).isEqualTo("egis")
+    }
 }
