@@ -9,13 +9,12 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
-import org.junit.ComparisonFailure
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.RuntimeException
+import java.net.UnknownHostException
 import java.util.concurrent.CancellationException
 
 @ExperimentalCoroutinesApi
@@ -35,6 +34,19 @@ class CoroutinesStructureDemoTest {
     @Before
     fun setUp() {
         sut = AsyncAwaitActivity()
+    }
+
+    @Test
+    fun `invokeOnCompletion receives exception thrown`() {
+        var resultThrowable: Throwable? = null
+        CoroutineScope(Main).launch {
+            throw UnknownHostException("egis")
+        }.invokeOnCompletion {
+            resultThrowable = it
+        }
+
+        assertThat(resultThrowable?.message).isEqualTo("egis")
+        assertThat(resultThrowable is UnknownHostException).isTrue()
     }
 
     @Test
@@ -172,7 +184,7 @@ class CoroutinesStructureDemoTest {
         assertThat(hasRunChild2).isTrue()
     }
 
-    @Test (expected = Exception::class)
+    @Test(expected = Exception::class)
     fun `when a child fails with exception, all children get cancelled`() = runBlockingTest {
 
         var hasRunChild1 = false
@@ -205,7 +217,7 @@ class CoroutinesStructureDemoTest {
         assertThat(hasRunChild1).isFalse()
         assertThat(hasRunChild2).isFalse()
     }
-    
+
     @Test
     fun `cooperative cancellation is needed to finish execution`() = runBlockingTest {
 
