@@ -24,6 +24,18 @@ class FlowTest {
     }
 
     @Test
+    fun `toList() operator collects even when delay() is called between emissions`() = runBlockingTest {
+        val flow = flow {
+            for (value in 1..3) {
+                emit(value)
+                delay(10)
+            }
+        }
+
+        assertThat(flow.toList()).isEqualTo(listOf(1, 2, 3))
+    }
+
+    @Test
     fun `show how to create sequence flow`() {
 
         fun foo(): Sequence<Int> = sequence { // sequence builder
