@@ -21,8 +21,6 @@ class ConversionToCoroutinesDemoTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    // Sets the main coroutines dispatcher to a TestCoroutineScope for unit testing.
-    @ExperimentalCoroutinesApi
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 

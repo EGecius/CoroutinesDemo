@@ -18,7 +18,6 @@ class FlowToLiveDataTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 

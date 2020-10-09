@@ -13,8 +13,6 @@ import java.util.concurrent.CancellationException
 
 class CoroutineExceptionsTest {
 
-    /** Sets the main coroutines dispatcher to a TestCoroutineScope for unit testing */
-    @ExperimentalCoroutinesApi
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 

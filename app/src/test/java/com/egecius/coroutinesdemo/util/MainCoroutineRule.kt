@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.egecius.coroutinesdemo.util
 
 import kotlinx.coroutines.CoroutineDispatcher
@@ -49,7 +51,6 @@ import kotlin.coroutines.ContinuationInterceptor
  *
  * ```
  */
-@ExperimentalCoroutinesApi
 class MainCoroutineRule : TestWatcher(), TestCoroutineScope by TestCoroutineScope() {
 
     override fun starting(description: Description?) {
