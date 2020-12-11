@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.egecius.coroutinesdemo.util.neverEndingEmptyFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -27,14 +26,14 @@ class TurbineLibraryTests {
         }
     }
 
-    @Test (expected = TimeoutCancellationException::class)
+    @Test(expected = TimeoutCancellationException::class)
     fun `checks if a flow completed`() = runBlocking {
-    	neverEndingEmptyFlow().test {
-    	    expectComplete()
+        neverEndingEmptyFlow().test {
+            expectComplete()
         }
     }
 
-    @Test (expected = AssertionError::class)
+    @Test(expected = AssertionError::class)
     fun `throws assertion error if complete event is found`() = runBlockingTest {
         emptyFlow<Int>().test {
             expectNoEvents()
@@ -43,8 +42,9 @@ class TurbineLibraryTests {
 
     @Test
     fun `test passes if no events are found, including no completion event`() = runBlockingTest {
-    	neverEndingEmptyFlow().test {
-    	    expectNoEvents()
+        neverEndingEmptyFlow().test {
+            expectNoEvents()
         }
     }
+
 }
