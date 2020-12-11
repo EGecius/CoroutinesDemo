@@ -1,5 +1,7 @@
 package com.egecius.coroutinesdemo
 
+import android.content.ClipData
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.egecius.coroutinesdemo.util.neverEndingEmptyFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,6 +46,14 @@ class TurbineLibraryTests {
     fun `test passes if no events are found, including no completion event`() = runBlockingTest {
         neverEndingEmptyFlow().test {
             expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `allows to assert events wtih more detail`() = runBlockingTest {
+        flowOf(67).test {
+            assertThat(expectEvent()).isEqualTo(Event.Item(67))
+            assertThat(expectEvent()).isEqualTo(Event.Complete)
         }
     }
 
