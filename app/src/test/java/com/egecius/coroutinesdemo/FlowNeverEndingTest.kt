@@ -1,5 +1,6 @@
 package com.egecius.coroutinesdemo
 
+import app.cash.turbine.test
 import com.egecius.coroutinesdemo.util.neverEndingEmittingFlow
 import com.egecius.coroutinesdemo.util.neverEndingEmptyFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -9,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Ignore
 import org.junit.Test
+import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
 class FlowNeverEndingTest {
@@ -28,9 +30,16 @@ class FlowNeverEndingTest {
 
     @Test
     fun `cancelling never-ending flow allows test to finish`() = runBlockingTest {
+
         val job = launch {
             neverEndingEmptyFlow().collect { }
         }
         job.cancel()
+    }
+
+    @ExperimentalTime
+    @Test
+    fun `Turbine library verify that no assertions were made`() = runBlockingTest {
+        neverEndingEmptyFlow().test { expectNoEvents() }
     }
 }
