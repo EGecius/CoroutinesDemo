@@ -66,6 +66,15 @@ class TurbineLibraryTests {
     	    assertThat(expectItem()).isEqualTo(1)
         }
     }
+    
+    @Test
+    fun `flows can be canceled at any time and will not require consuming a complete or error event`() = runBlockingTest {
+        flowOf(1, 2, 3, 4).test {
+            assertThat(expectItem()).isEqualTo(1)
+            assertThat(expectItem()).isEqualTo(2)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 
     @Test
     fun `allows asserting errors`() = runBlockingTest {
