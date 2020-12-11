@@ -5,6 +5,7 @@ import com.egecius.coroutinesdemo.util.neverEndingEmittingFlow
 import com.egecius.coroutinesdemo.util.neverEndingEmptyFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
@@ -12,6 +13,7 @@ import org.junit.Ignore
 import org.junit.Test
 import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 @ExperimentalCoroutinesApi
 class FlowNeverEndingTest {
 
@@ -37,9 +39,13 @@ class FlowNeverEndingTest {
         job.cancel()
     }
 
-    @ExperimentalTime
     @Test
     fun `Turbine library verify that no assertions were made`() = runBlockingTest {
         neverEndingEmptyFlow().test { expectNoEvents() }
+    }
+
+    @Test (expected = AssertionError::class)
+    fun `Turbine library catches emissions`() = runBlockingTest {
+    	flowOf(1).test { expectNoEvents() }
     }
 }
