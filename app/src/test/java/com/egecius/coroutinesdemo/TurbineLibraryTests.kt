@@ -7,10 +7,12 @@ import com.egecius.coroutinesdemo.util.neverEndingEmptyFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.time.ExperimentalTime
 
@@ -61,6 +63,13 @@ class TurbineLibraryTests {
     fun `fails if certain events are not complete`() = runBlockingTest {
     	flowOf(1).test {
     	    assertThat(expectItem()).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `allows asserting errors`() = runBlockingTest {
+        flow<Unit> { throw RuntimeException("broken!") }.test {
+            assertEquals("broken!", expectError().message)
         }
     }
 }
