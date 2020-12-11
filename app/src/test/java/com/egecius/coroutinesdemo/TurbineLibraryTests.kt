@@ -16,6 +16,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 @ExperimentalCoroutinesApi
 @ExperimentalTime
@@ -82,6 +83,15 @@ class TurbineLibraryTests {
             assertEquals("item", expectItem())
             expectComplete()
         }
+    }
 
+    @Test (expected = TimeoutCancellationException::class)
+    fun `timeout can be configured`() = runBlockingTest {
+        flow<Unit> {
+            delay(100)
+        }.test (timeout = 50.milliseconds) {
+            assertEquals("item", expectItem())
+            expectComplete()
+        }
     }
 }
