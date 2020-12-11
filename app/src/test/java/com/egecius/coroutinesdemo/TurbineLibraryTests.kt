@@ -50,11 +50,17 @@ class TurbineLibraryTests {
     }
 
     @Test
-    fun `allows to assert events wtih more detail`() = runBlockingTest {
+    fun `allows to assert events with more detail`() = runBlockingTest {
         flowOf(67).test {
             assertThat(expectEvent()).isEqualTo(Event.Item(67))
             assertThat(expectEvent()).isEqualTo(Event.Complete)
         }
     }
 
+    @Test (expected = AssertionError::class)
+    fun `fails if certain events are not complete`() = runBlockingTest {
+    	flowOf(1).test {
+    	    assertThat(expectItem()).isEqualTo(1)
+        }
+    }
 }
