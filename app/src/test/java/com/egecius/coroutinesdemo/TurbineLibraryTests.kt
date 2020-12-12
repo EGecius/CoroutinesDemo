@@ -3,6 +3,7 @@ package com.egecius.coroutinesdemo
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.egecius.coroutinesdemo.util.neverEndingEmptyFlow
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -11,8 +12,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -25,8 +24,8 @@ class TurbineLibraryTests {
     fun `asserts that certain items were emitted`() = runBlocking {
 
         flowOf(7, 9).test {
-            assertThat(expectItem()).isEqualTo(7)
-            assertThat(expectItem()).isEqualTo(9)
+            expectItem() shouldBe 7
+            expectItem() shouldBe 9
             expectComplete()
         }
     }
@@ -55,23 +54,23 @@ class TurbineLibraryTests {
     @Test
     fun `allows to assert events with more detail`() = runBlockingTest {
         flowOf(67).test {
-            assertThat(expectEvent()).isEqualTo(Event.Item(67))
-            assertThat(expectEvent()).isEqualTo(Event.Complete)
+            expectEvent() shouldBe Event.Item(67)
+            expectEvent() shouldBe Event.Complete
         }
     }
 
-    @Test (expected = AssertionError::class)
+    @Test(expected = AssertionError::class)
     fun `fails if certain events are not complete`() = runBlockingTest {
-    	flowOf(1).test {
-    	    assertThat(expectItem()).isEqualTo(1)
+        flowOf(1).test {
+            expectEvent() shouldBe 1
         }
     }
-    
+
     @Test
     fun `flows can be canceled at any time and will not require consuming a complete or error event`() = runBlockingTest {
         flowOf(1, 2, 3, 4).test {
-            assertThat(expectItem()).isEqualTo(1)
-            assertThat(expectItem()).isEqualTo(2)
+            expectItem() shouldBe 1
+            expectItem() shouldBe 2
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -79,26 +78,26 @@ class TurbineLibraryTests {
     @Test
     fun `allows asserting errors`() = runBlockingTest {
         flow<Unit> { throw RuntimeException("broken!") }.test {
-            assertEquals("broken!", expectError().message)
+            expectError().message shouldBe "broken!"
         }
     }
 
-    @Test (expected = TimeoutCancellationException::class)
+    @Test(expected = TimeoutCancellationException::class)
     fun `times out after 1s`() = runBlockingTest {
         flow<Unit> {
             delay(2000)
         }.test {
-            assertEquals("item", expectItem())
+            expectItem() shouldBe "item"
             expectComplete()
         }
     }
 
-    @Test (expected = TimeoutCancellationException::class)
+    @Test(expected = TimeoutCancellationException::class)
     fun `timeout can be configured`() = runBlockingTest {
         flow<Unit> {
             delay(100)
-        }.test (timeout = 50.milliseconds) {
-            assertEquals("item", expectItem())
+        }.test(timeout = 50.milliseconds) {
+            expectItem() shouldBe "item"
             expectComplete()
         }
     }
