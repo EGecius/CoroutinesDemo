@@ -2,12 +2,14 @@ package com.egecius.coroutinesdemo
 
 import app.cash.turbine.test
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Ignore
 import org.junit.Test
-import org.junit.runners.model.TestTimedOutException
 import kotlin.time.ExperimentalTime
 
 @ObsoleteCoroutinesApi
@@ -30,12 +32,6 @@ class ControllingVirtualTime {
 
     @Test
     fun `'runBlockingTest' auto-advances virtual time`() = runBlockingTest {
-    	val foo = returnAfter1sDelay()
-        foo shouldBe "delayed"
-    }
-
-    @Test(timeout = 100) @Ignore("will time out")
-    fun `'runBlocking' does not auto-advances virtual time`() = runBlocking {
         val foo = returnAfter1sDelay()
         foo shouldBe "delayed"
     }
@@ -43,6 +39,13 @@ class ControllingVirtualTime {
     private suspend fun returnAfter1sDelay(): String {
         delay(1000)
         return "delayed"
+    }
+
+    @Test(timeout = 100)
+    @Ignore("will time out")
+    fun `'runBlocking' does not auto-advances virtual time`() = runBlocking {
+        val foo = returnAfter1sDelay()
+        foo shouldBe "delayed"
     }
 
     @Test
