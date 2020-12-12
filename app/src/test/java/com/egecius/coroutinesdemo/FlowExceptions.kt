@@ -18,8 +18,9 @@ class FlowExceptions {
     private var count = 0
 
     private val failingFlow: Flow<Int> = flow {
-        if (count < 2) {
-            throw EgisException("demo 1")
+        count++
+        if (count < 3) {
+            throw EgisException("from EgisException")
         } else {
             throw RuntimeException("from in RuntimeException")
         }
@@ -33,13 +34,25 @@ class FlowExceptions {
     @Test
     fun `'retry' allows retry if a certain condition is met`() = runBlockingTest {
         failingFlow.retry { throwable ->
-            count++
             // will retry if this condition is met
             throwable is EgisException
         }.test {
             assertThat(expectError().message).isEqualTo("from in RuntimeException")
         }
 
+        // count is 3: 1st as normal try + two as retries
         assertThat(count).isEqualTo(3)
+    }
+
+    @Test
+    fun `'retry' also allows easily setting the number of retries as  param`() = runBlockingTest {
+        failingFlow.retry(retries = 1) { throwable ->
+            throwable is EgisException
+        }.test {
+            assertThat(expectError().message).isEqualTo("from EgisException")
+        }
+
+        // count is 2: 1st as normal try + 2nd as retry
+        assertThat(count).isEqualTo(2)
     }
 }
