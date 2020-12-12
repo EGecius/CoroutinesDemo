@@ -3,7 +3,6 @@ package com.egecius.coroutinesdemo
 import app.cash.turbine.test
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -11,26 +10,10 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Ignore
 import org.junit.Test
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-import kotlin.time.seconds
 
-@ObsoleteCoroutinesApi
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class ControllingVirtualTime {
-
-//    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
-//
-//    @Before
-//    fun setup() {
-//    	Dispatchers.setMain(mainThreadSurrogate)
-//    }
-//
-//    @After
-//    fun cleanup() {
-//        Dispatchers.resetMain()
-//        mainThreadSurrogate.close()
-//    }
 
     @Test
     fun `'runBlockingTest' auto-advances virtual time`() = runBlockingTest {
@@ -50,7 +33,8 @@ class ControllingVirtualTime {
         foo shouldBe "delayed"
     }
 
-    @Test @Ignore("for some reason does not work with Flow")
+    @Test
+    @Ignore("for some reason does not work with Flow")
     fun `shows how to control virtual time`() = runBlockingTest {
         val myFlow = flow {
             delay(1_000)
