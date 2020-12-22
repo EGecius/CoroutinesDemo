@@ -2,10 +2,8 @@ package com.egecius.coroutinesdemo
 
 import app.cash.turbine.test
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Ignore
 import org.junit.Test
@@ -46,5 +44,24 @@ class ControllingVirtualTime {
             expectItem() shouldBe 13
             expectComplete()
         }
+    }
+
+    @Test
+    fun `auto-advancing virtual time works precisely to the millisecond`() = runBlockingTest {
+        val resultList = mutableListOf<Int>()
+
+        val job = launch {
+            resultList.add(1)
+            // '3' will be added after 1000ms delay, which is 1ms later than '2'
+            delay(1_000)
+            resultList.add(3)
+        }
+
+        delay(999)
+        resultList.add(2)
+
+        job.join()
+
+        resultList shouldBe listOf(1, 2, 3)
     }
 }
