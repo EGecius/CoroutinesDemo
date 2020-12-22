@@ -61,7 +61,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.1'
     testImplementation "org.assertj:assertj-core:3.16.1"
     testImplementation 'app.cash.turbine:turbine:0.3.0'
-    testImplementation 'io.kotest:kotest-assertions-core:4.3.0'
+    testImplementation 'io.kotest:kotest-assertions-core:4.3.2'
 
     testImplementation "org.mockito:mockito-core:3.2.4"
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0") {
