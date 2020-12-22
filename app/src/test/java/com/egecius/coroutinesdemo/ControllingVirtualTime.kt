@@ -28,7 +28,7 @@ class ControllingVirtualTime {
 
     @Test(timeout = 100)
     @Ignore("will time out")
-    fun `'runBlocking' does not auto-advances virtual time`() = runBlocking {
+    fun `'runBlocking' does not auto-advance virtual time`() = runBlocking {
         val foo = returnAfter1sDelay()
         foo shouldBe "delayed"
     }
