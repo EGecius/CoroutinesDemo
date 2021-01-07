@@ -1,6 +1,7 @@
 package com.egecius.coroutinesdemo
 
 import com.egecius.coroutinesdemo.util.log
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.test.runBlockingTest
@@ -184,5 +185,22 @@ class CoroutineContextAndDispatchersTest {
             println("thread: $threadName")
             assertThat(threadName).contains("egis-test")
         }
+    }
+
+    @Test
+    fun `calling await multiple times returns same result each time`() = runBlockingTest {
+
+        val async = async {
+            getValueFromCoroutine()
+        }
+
+        async.await() shouldBe 1
+        async.await() shouldBe 1
+        async.await() shouldBe 1
+    }
+
+    private suspend fun getValueFromCoroutine(): Int {
+        delay(1)
+        return 1
     }
 }
