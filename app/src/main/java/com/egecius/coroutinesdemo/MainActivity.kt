@@ -1,13 +1,18 @@
 package com.egecius.coroutinesdemo
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -19,6 +24,30 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setClickListener()
+
+        demoLaunchWhenStarted()
+    }
+
+    private fun demoLaunchWhenStarted() {
+        // Flow will pause emitting on onStop() but will continue emitting on onStart()
+        lifecycleScope.launchWhenStarted {
+            neverEndingEmittingFlow().collect {
+                Log.v("Eg:MainActivity:29", "onCreate() it: $it")
+            }
+        }
+
+        Log.v("Eg:MainActivity:35", "onCreate() emitIn5s")
+
+        // Coroutine will keep running after onStop() but will emit only on onStart()
+        lifecycleScope.launchWhenStarted {
+            val result = emitIn5s()
+            Log.v("Eg:MainActivity:38", "onCreate() result: $result")
+        }
+    }
+
+    private suspend fun emitIn5s(): String {
+        delay(5_000)
+        return "emission after 5s"
     }
 
     private fun setClickListener() {
@@ -62,5 +91,14 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val RESULT_1 = "Result 1"
         private const val RESULT_2 = "Result 2"
+    }
+}
+
+fun neverEndingEmittingFlow(): Flow<Unit> {
+    return flow {
+        while (true) {
+            delay(1_000)
+            emit(Unit)
+        }
     }
 }
