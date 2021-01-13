@@ -94,4 +94,27 @@ class CoroutineExceptionsTest {
 
         assertThat(isCaughtAtTheTopLevelHandler).isTrue()
     }
+
+    @Test
+    fun `alternatively, you can pass exception handler as a param to top-level coroutine builder rather than scope`() {
+        var isCaughtAtTheTopLevelHandler = false
+
+        val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, exception ->
+            println("Handle $exception in CoroutineExceptionHandler")
+            isCaughtAtTheTopLevelHandler = true
+        }
+        val topLevelScope = CoroutineScope(Job())
+
+        // HERE! passing to the coroutine builder rather than topLevelScope
+        topLevelScope.launch(coroutineExceptionHandler) {
+            launch {
+                throw RuntimeException("RuntimeException in nested coroutine")
+            }
+        }
+
+        // waiting for the handler body to be executed asynchronously
+        Thread.sleep(100)
+
+        assertThat(isCaughtAtTheTopLevelHandler).isTrue()
+    }
 }
