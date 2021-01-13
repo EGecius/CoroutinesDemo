@@ -72,22 +72,4 @@ class CoroutineExceptionsTest {
             }
         }
     }
-
-    @Test
-    fun `catching CancellationException prevents a coroutine from working properly`() = runBlockingTest {
-
-        val job = launch {
-            // to fix cancellation I would hav to comment out the try/catch block
-            try {
-                delay(100)
-            } catch (e: Exception) {
-                println("exception caught: $e")
-            }
-            println("Coroutine still running - cancellation got broken! ... ")
-        }
-
-        delay(50)
-        println("cancelling...")
-        job.cancel()
-    }
 }
