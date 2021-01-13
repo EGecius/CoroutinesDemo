@@ -140,4 +140,26 @@ class CancellationTest {
         println("cancelling...")
         job.cancel()
     }
+
+    @Test
+    fun `way no 1 to avoid breaking cancellation is to rethrow CancellationException`() = runBlockingTest {
+        var didCoroutineIgnoreCancellation = false
+
+        val job = launch {
+
+            try {
+                delay(10)
+            } catch (e: Exception) {
+                if (e is CancellationException) {
+                    throw e
+                }
+                println("Coroutine still running - cancellation got broken! ... ")
+                didCoroutineIgnoreCancellation = true
+            }
+        }
+
+        job.cancel()
+
+        assertThat(didCoroutineIgnoreCancellation).isFalse()
+    }
 }
