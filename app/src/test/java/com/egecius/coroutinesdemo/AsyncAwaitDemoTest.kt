@@ -2,6 +2,7 @@
 
 package com.egecius.coroutinesdemo
 
+import com.egecius.coroutinesdemo.util.failingCoroutine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
@@ -118,5 +119,27 @@ class AsyncAwaitDemoTest {
             }
         }
         Thread.sleep(100)
+    }
+
+    @Test
+    fun `using coroutineScope() does not re-throw exceptions up the hierarchy tree`() {
+
+        var wasCaughtInTryCatchBlock = false
+
+        CoroutineScope(Job()).launch {
+
+            coroutineScope {
+                try {
+                    failingCoroutine()
+                } catch (e: Exception) {
+                    wasCaughtInTryCatchBlock = true
+                    println("exception caught using coroutineScope: $e")
+                }
+            }
+        }
+
+        Thread.sleep(100)
+
+        assertThat(wasCaughtInTryCatchBlock).isTrue
     }
 }
