@@ -1,3 +1,3 @@
 package com.egecius.coroutinesdemo
 
-class EgisException(message: String? = null) : Throwable(message = message)
+class EgisException(message: String? = null) : Exception(message)

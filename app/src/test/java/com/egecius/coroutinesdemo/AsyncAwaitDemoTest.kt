@@ -1,3 +1,5 @@
+@file:Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
+
 package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
@@ -76,5 +78,28 @@ class AsyncAwaitDemoTest {
         }
 
         assertThat(wasCaughtInTryCatchBlock).isFalse
+    }
+
+    @Test
+    fun `exception thrown in async block can be caught when called await() on Deferred`() {
+        var wasCaughtInTryCatchBlock = false
+        val topLevelScope = CoroutineScope(SupervisorJob())
+
+        val deferred = topLevelScope.async {
+            throw EgisException()
+        }
+
+        topLevelScope.launch {
+            try {
+                deferred.await()
+            } catch (e: Exception) {
+                println("caught: $e")
+                wasCaughtInTryCatchBlock = true
+            }
+        }
+
+        Thread.sleep(200)
+
+        assertThat(wasCaughtInTryCatchBlock).isTrue
     }
 }
