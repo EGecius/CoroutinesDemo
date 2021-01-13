@@ -1,5 +1,6 @@
 package com.egecius.coroutinesdemo.util
 
+import com.egecius.coroutinesdemo.EgisException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -19,4 +20,9 @@ fun neverEndingEmittingFlow(): Flow<Unit> {
             emit(Unit)
         }
     }
+}
+
+suspend fun failingCoroutine() {
+    delay(1)
+    throw EgisException()
 }

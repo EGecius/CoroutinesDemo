@@ -4,13 +4,16 @@ package com.egecius.coroutinesdemo
 
 import androidx.lifecycle.viewModelScope
 import com.egecius.coroutinesdemo.util.MainCoroutineRule
+import com.egecius.coroutinesdemo.util.failingCoroutine
 import kotlinx.coroutines.*
+import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import java.net.UnknownHostException
 import java.util.concurrent.CancellationException
 
+@ExperimentalCoroutinesApi
 class CoroutineExceptionsTest {
 
     @get:Rule
@@ -49,12 +52,24 @@ class CoroutineExceptionsTest {
     fun `viewModelScope job intercepts exception`() {
         var resultThrowable: Throwable? = null
 
-        MyViewModel().viewModelScope.launch{
+        MyViewModel().viewModelScope.launch {
             throw Exception("egis")
         }.invokeOnCompletion {
             resultThrowable = it
         }
 
         assertThat(resultThrowable?.message).isEqualTo("egis")
+    }
+
+    @Test(expected = EgisException::class)
+    fun `very unintuitively, try catch does not catch exceptions thrown by coroutines`() = runBlockingTest {
+
+        launch {
+            // this will cause a crash
+            try {
+                failingCoroutine()
+            } catch (e: Exception) {
+            }
+        }
     }
 }
