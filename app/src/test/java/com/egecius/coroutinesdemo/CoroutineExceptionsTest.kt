@@ -72,4 +72,26 @@ class CoroutineExceptionsTest {
             }
         }
     }
+
+    @Test
+    fun `instead of throwing an exception, a coroutine propagates it up the hierarchy and can be caught with an exception handler installed at the top level`() {
+        var isCaughtAtTheTopLevelHandler = false
+
+        val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, exception ->
+            println("Handle $exception in CoroutineExceptionHandler")
+            isCaughtAtTheTopLevelHandler = true
+        }
+        val topLevelScope = CoroutineScope(Job() + coroutineExceptionHandler)
+
+        topLevelScope.launch {
+            launch {
+                throw RuntimeException("RuntimeException in nested coroutine")
+            }
+        }
+
+        // waiting for the handler body to be executed asynchronously
+        Thread.sleep(100)
+
+        assertThat(isCaughtAtTheTopLevelHandler).isTrue()
+    }
 }
