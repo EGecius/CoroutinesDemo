@@ -61,4 +61,65 @@ class CancellationTest {
 
         assertThat(result).isNull()
     }
+
+
+    @Test
+    fun `passing supervisor job breaks cancellation hierarchy of structured concurrency - passed job will become the parent of the coroutine`() =
+        runBlocking {
+
+            var wasSupervisorJobCancelled = false
+
+            val scope = CoroutineScope(Job())
+            scope.launch {
+
+                // this SupervisorJob will be become take the spot of being the parent of the coroutine job, thus preventing the scope from ever cancelling it
+                launch(SupervisorJob()) {
+                    println("performing some work in Coroutine")
+                    delay(100)
+                }.invokeOnCompletion { throwable: Throwable? ->
+                    println("invokeOnCompletion with throwable: $throwable")
+                    if (throwable is CancellationException) {
+                        wasSupervisorJobCancelled = true
+                    }
+                }
+            }
+
+            // cancel scope while Coroutine performs work
+            delay(50)
+            scope.cancel()
+
+            assertThat(wasSupervisorJobCancelled).isFalse
+            Unit
+        }
+
+    @Test
+    fun `avoid passing a job to a coroutine keeps the usual cancellation hierarchy, thus allowing the scope to cancel it`() = runBlocking {
+
+        var wasSupervisorJobCancelled = false
+
+        val scope = CoroutineScope(Job())
+        scope.launch {
+
+            // not passing a job as param this time
+            launch {
+                println("performing some work in Coroutine")
+                delay(100)
+            }.invokeOnCompletion { throwable: Throwable? ->
+                println("invokeOnCompletion with throwable: $throwable")
+                if (throwable is CancellationException) {
+                    println("invokeOnCompletion setting to true")
+                    wasSupervisorJobCancelled = true
+                }
+            }
+        }
+
+        // cancel scope while Coroutine performs work
+        delay(50)
+        scope.cancel()
+        delay(100)
+
+        // unlike the above the coroutine will get cancelled
+        assertThat(wasSupervisorJobCancelled).isTrue
+        Unit
+    }
 }
