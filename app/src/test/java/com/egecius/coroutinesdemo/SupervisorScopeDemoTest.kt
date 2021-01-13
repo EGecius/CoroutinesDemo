@@ -2,6 +2,7 @@ package com.egecius.coroutinesdemo
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Ignore
 import org.junit.Test
 
@@ -62,6 +63,43 @@ class SupervisorScopeDemoTest {
                 println("starting child2")
                 delay(100)
                 println("completed child2")
+            }
+        }
+    }
+
+    @Test
+    fun `passing supervisor job breaks cancellation hierarchy of structured concurrency - passed job will become the parent of the coroutine`() = runBlockingTest {
+
+        var wasSupervisorJobCancelled = false
+
+        val scopeJob = Job()
+        val scope = CoroutineScope(scopeJob)
+
+        scope.launch {
+
+            // this SupervisorJob will be become take the spot of being the parent of the coroutine job, thus preventing the scope from ever cancelling it
+            launch(SupervisorJob()) {
+                println("performing some work in Coroutine")
+                delay(100)
+            }.invokeOnCompletion { throwable: Throwable? ->
+                if (throwable is CancellationException) {
+                    wasSupervisorJobCancelled = true
+                }
+            }
+        }
+
+        // cancel scope while Coroutine performs work
+        delay(50)
+        scope.cancel()
+
+        assertThat(wasSupervisorJobCancelled).isFalse()
+    }
+
+    @Test
+    fun `using coroutine scope does not break cancellation unlike passing SupervisorJob`() = runBlockingTest {
+        supervisorScope {
+            launch {
+
             }
         }
     }
