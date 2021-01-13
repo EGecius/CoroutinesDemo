@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class AwaitDemoTest {
+class AsyncAwaitDemoTest {
 
     @Test
     fun `async block gets executed before await() is called`() = runBlockingTest {
