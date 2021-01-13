@@ -162,4 +162,23 @@ class CancellationTest {
 
         assertThat(didCoroutineIgnoreCancellation).isFalse()
     }
+
+    @Test
+    fun `way no 2 to avoid breaking cancellation is to only catch exceptions other than CancellationException`() = runBlockingTest {
+        var didCoroutineIgnoreCancellation = false
+
+        val job = launch {
+
+            try {
+                delay(10)
+            } catch (e: EgisException) {
+                println("Coroutine still running - cancellation got broken! ... ")
+                didCoroutineIgnoreCancellation = true
+            }
+        }
+
+        job.cancel()
+
+        assertThat(didCoroutineIgnoreCancellation).isFalse()
+    }
 }
