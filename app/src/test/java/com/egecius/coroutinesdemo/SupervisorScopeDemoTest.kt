@@ -68,7 +68,7 @@ class SupervisorScopeDemoTest {
     }
 
     @Test
-    fun `passing supervisor job breaks cancellation hierarchy of structured concurrency - passed job will become the parent of the coroutine`() = runBlockingTest {
+    fun `passing supervisor job breaks cancellation hierarchy of structured concurrency - passed job will become the parent of the coroutine`() = runBlocking {
 
         var wasSupervisorJobCancelled = false
 
@@ -82,6 +82,7 @@ class SupervisorScopeDemoTest {
                 println("performing some work in Coroutine")
                 delay(100)
             }.invokeOnCompletion { throwable: Throwable? ->
+                println("invokeOnCompletion with throwable: $throwable")
                 if (throwable is CancellationException) {
                     wasSupervisorJobCancelled = true
                 }
@@ -92,7 +93,41 @@ class SupervisorScopeDemoTest {
         delay(50)
         scope.cancel()
 
-        assertThat(wasSupervisorJobCancelled).isFalse()
+        assertThat(wasSupervisorJobCancelled).isFalse
+        Unit
+    }
+
+    @Test
+    fun `avoid passing a job to a coroutine keeps the usual cancellation hierarchy, thus allowing the scope to cancel it`() = runBlocking {
+
+        var wasSupervisorJobCancelled = false
+
+        val scopeJob = Job()
+        val scope = CoroutineScope(scopeJob)
+
+        scope.launch {
+
+            // not passing a job as param this time
+            launch {
+                println("performing some work in Coroutine")
+                delay(100)
+            }.invokeOnCompletion { throwable: Throwable? ->
+                println("invokeOnCompletion with throwable: $throwable")
+                if (throwable is CancellationException) {
+                    println("invokeOnCompletion setting to true")
+                    wasSupervisorJobCancelled = true
+                }
+            }
+        }
+
+        // cancel scope while Coroutine performs work
+        delay(50)
+        scope.cancel()
+        delay(100)
+
+        // unlike the above the coroutine will get cancelled
+        assertThat(wasSupervisorJobCancelled).isTrue
+        Unit
     }
 
     @Test
