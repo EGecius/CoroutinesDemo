@@ -102,4 +102,21 @@ class AsyncAwaitDemoTest {
 
         assertThat(wasCaughtInTryCatchBlock).isTrue
     }
+
+    @Test
+    fun `when async is not a top level coroutine exception is thrown without waiting for await() call`() {
+
+        val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, exception ->
+            println("Handle $exception in CoroutineExceptionHandler")
+        }
+
+        val topLevelScope = CoroutineScope(SupervisorJob() + coroutineExceptionHandler)
+        topLevelScope.launch {
+            // async not at the top level - exception will be thrown without waiting for await() call
+            async {
+                throw RuntimeException("RuntimeException in async coroutine")
+            }
+        }
+        Thread.sleep(100)
+    }
 }
