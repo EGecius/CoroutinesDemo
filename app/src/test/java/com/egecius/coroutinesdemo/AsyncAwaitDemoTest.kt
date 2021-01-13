@@ -58,4 +58,23 @@ class AsyncAwaitDemoTest {
         @Suppress("UNUSED_VARIABLE") val result = deferred.await()
         assertThat(deferred.isCompleted).isTrue()
     }
+
+    @Test
+    fun `exception thrown in async block is not caught in try catch -- it's encapsulated inside Deferred object instead`() {
+
+        var wasCaughtInTryCatchBlock = false
+
+        CoroutineScope(Job()).launch {
+            // this try/catch block won't catch it since Exception thrown in async block is encapsulated inside Deferred object
+            try {
+                async {
+                    throw EgisException()
+                }
+            } catch (e: Exception) {
+                wasCaughtInTryCatchBlock = true
+            }
+        }
+
+        assertThat(wasCaughtInTryCatchBlock).isFalse
+    }
 }
