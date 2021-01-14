@@ -1,6 +1,9 @@
 package com.egecius.coroutinesdemo
 
+import android.util.Log
 import androidx.lifecycle.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MyViewModel : ViewModel() {
 
@@ -15,6 +18,22 @@ class MyViewModel : ViewModel() {
 
     private suspend fun fetchItem(): FakeItem {
         return fakeRepo.fetchItem()
+    }
+
+    fun startModelling() {
+        demoInvokeOnCompletion()
+    }
+
+    private fun demoInvokeOnCompletion() {
+        viewModelScope.launch {
+            willFinishIn1s()
+        }.invokeOnCompletion {
+            Log.v("Eg:MyViewModel:31", "demoInvokeOnCompletion() it: $it")
+        }
+    }
+
+    private suspend fun willFinishIn1s() {
+        delay(1_000)
     }
 
     /** This shows how LiveData delegates to another LiveData */
