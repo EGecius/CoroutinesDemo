@@ -1,5 +1,6 @@
 package com.egecius.coroutinesdemo
 
+import android.util.Log
 import com.egecius.coroutinesdemo.util.log
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.*
@@ -8,6 +9,8 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Ignore
 import org.junit.Test
+import java.math.BigInteger
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 @ExperimentalCoroutinesApi
@@ -101,6 +104,25 @@ class CoroutineContextAndDispatchersTest {
                     log("Back to ctx1")
                 }
             }
+        }
+    }
+
+    @Test
+    fun `withContext() allows following the convention that all suspend functions should be non-blocking`() = runBlocking {
+        val result: BigInteger = findBigPrime()
+
+        assertThat(result).isNotNull
+
+        Unit
+    }
+
+    private suspend fun findBigPrime(): BigInteger {
+        val name = Thread.currentThread().name
+        println("findBigPrime() outside withContext() thread: $name")
+        return withContext(Dispatchers.Default) {
+            val name2 = Thread.currentThread().name
+            println("findBigPrime() within Dispatchers.Default thread: $name2")
+            BigInteger.probablePrime(2048, Random())
         }
     }
 
