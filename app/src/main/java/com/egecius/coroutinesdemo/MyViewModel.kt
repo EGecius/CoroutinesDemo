@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 class MyViewModel : ViewModel() {
 
@@ -39,10 +40,20 @@ class MyViewModel : ViewModel() {
         }
         viewModelScope.launch(coroutineExceptionHandler) {
             willFinishIn1s()
-            willFail()
+            willCancelItself()
+            willPrintLog()
         }.invokeOnCompletion {
             Log.v("Eg:MyViewModel:31", "demoInvokeOnCompletion() it: $it")
         }
+    }
+
+    private fun willPrintLog() {
+        Log.i("Eg:MyViewModel:51", "willPrintLog() ")
+    }
+
+    private suspend fun willCancelItself() {
+        delay(1)
+        throw CancellationException()
     }
 
     private suspend fun willFinishIn1s() {
