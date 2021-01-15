@@ -22,7 +22,15 @@ class MyViewModel : ViewModel() {
     }
 
     fun startModelling() {
+        installThreadHandler()
         demoInvokeOnCompletion()
+    }
+
+    private fun installThreadHandler() {
+        val handler = Thread.UncaughtExceptionHandler { t: Thread, e: Throwable ->
+            Log.w("Eg:MyViewModel:26", "startModelling() e: $e")
+        }
+        Thread.setDefaultUncaughtExceptionHandler(handler)
     }
 
     private fun demoInvokeOnCompletion() {
