@@ -2,6 +2,7 @@ package com.egecius.coroutinesdemo
 
 import android.util.Log
 import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -25,8 +26,12 @@ class MyViewModel : ViewModel() {
     }
 
     private fun demoInvokeOnCompletion() {
-        viewModelScope.launch {
+        val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            Log.v("Eg:MyViewModel:30", "demoInvokeOnCompletion() throwable: $throwable")
+        }
+        viewModelScope.launch(coroutineExceptionHandler) {
             willFinishIn1s()
+            willFail()
         }.invokeOnCompletion {
             Log.v("Eg:MyViewModel:31", "demoInvokeOnCompletion() it: $it")
         }
@@ -34,6 +39,11 @@ class MyViewModel : ViewModel() {
 
     private suspend fun willFinishIn1s() {
         delay(1_000)
+    }
+
+    private suspend fun willFail() {
+        delay(1)
+        throw EgisException()
     }
 
     /** This shows how LiveData delegates to another LiveData */
