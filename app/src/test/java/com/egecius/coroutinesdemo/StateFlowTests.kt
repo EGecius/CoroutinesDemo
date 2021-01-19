@@ -4,7 +4,9 @@ import app.cash.turbine.test
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runBlockingTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import kotlin.time.ExperimentalTime
 
@@ -20,5 +22,18 @@ class StateFlowTests {
             expectItem() shouldBe 8
             expectComplete()
         }
+    }
+
+    @Test
+    fun `stateFlow has inbuilt distinctUntilChanged() functionality which operates on equals() contract`() = runBlockingTest {
+        val mutableStateFlow = MutableStateFlow(EgisData(8))
+        mutableStateFlow.emit(EgisData(8))
+        mutableStateFlow.emit(EgisData(8))
+
+        val resultList = mutableStateFlow.take(1).toList()
+
+        // despite 2 additional items emitted, only 1 emission is received because the emissions were equal to each other
+        assertThat(resultList.size).isEqualTo(1)
+        assertThat(resultList[0]).isEqualTo(EgisData(8))
     }
 }
