@@ -36,4 +36,15 @@ class StateFlowTests {
         assertThat(resultList.size).isEqualTo(1)
         assertThat(resultList[0]).isEqualTo(EgisData(8))
     }
+
+    @Test
+    fun `only the last emitted value is passed on to a new collector`() = runBlockingTest {
+        val mutableStateFlow = MutableStateFlow(EgisData(8))
+        mutableStateFlow.emit(EgisData(9))
+
+        mutableStateFlow.take(1).test {
+            expectItem() shouldBe EgisData(9)
+            expectComplete()
+        }
+    }
 }
