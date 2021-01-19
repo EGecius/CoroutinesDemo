@@ -3,6 +3,7 @@ package com.egecius.coroutinesdemo
 import app.cash.turbine.test
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runBlockingTest
@@ -44,6 +45,21 @@ class StateFlowTests {
 
         mutableStateFlow.take(1).test {
             expectItem() shouldBe EgisData(9)
+            expectComplete()
+        }
+    }
+    
+    @Test
+    fun `read-only value can be created with asStateFlow()`() = runBlockingTest{
+        val mutableStateFlow = MutableStateFlow(EgisData(1))
+        mutableStateFlow.emit(EgisData(2))
+
+        val readOnlyStateFlow = mutableStateFlow.asStateFlow()
+        // emit cannot be called on it
+//        readOnlyStateFlow.emit()
+
+        readOnlyStateFlow.take(1).test {
+            expectItem() shouldBe EgisData(2)
             expectComplete()
         }
     }
