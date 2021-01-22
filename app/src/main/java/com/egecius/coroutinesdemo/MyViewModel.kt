@@ -43,7 +43,7 @@ class MyViewModel : ViewModel() {
             willCancelItself()
             willPrintLog()
         }.invokeOnCompletion {
-            Log.v("Eg:MyViewModel:31", "demoInvokeOnCompletion() it: $it")
+//            Log.v("Eg:MyViewModel:31", "demoInvokeOnCompletion() it: $it")
         }
     }
 
