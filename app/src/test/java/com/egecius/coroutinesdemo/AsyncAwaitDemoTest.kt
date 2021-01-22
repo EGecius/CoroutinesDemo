@@ -142,4 +142,23 @@ class AsyncAwaitDemoTest {
 
         assertThat(wasCaughtInTryCatchBlock).isTrue
     }
+
+    // TODO: 22/01/2021 make it work - does not work as expected
+    @Test
+    fun `given at at the top level, async does not fail immediately, only when await is called`() {
+
+        GlobalScope.launch {
+            val deferred = async {
+                throw RuntimeException()
+            }
+            delay(100)
+            print("exception has been thrown")
+
+            deferred.await()
+        }.invokeOnCompletion {
+            print("invokeOnCompletion: $it")
+        }
+
+        Thread.sleep(100)
+    }
 }
