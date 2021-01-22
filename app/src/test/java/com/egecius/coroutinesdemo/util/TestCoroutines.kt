@@ -1,5 +1,6 @@
 package com.egecius.coroutinesdemo.util
 
+import android.util.Log
 import com.egecius.coroutinesdemo.EgisException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -26,3 +27,10 @@ suspend fun failingCoroutine() {
     delay(1)
     throw EgisException()
 }
+
+
+suspend fun nonFailingCoroutine() {
+    delay(10)
+    print("nonFailingCoroutine")
+}
+
