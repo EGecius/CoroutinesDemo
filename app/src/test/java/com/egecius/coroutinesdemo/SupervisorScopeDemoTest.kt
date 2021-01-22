@@ -1,8 +1,9 @@
 package com.egecius.coroutinesdemo
 
+import com.egecius.coroutinesdemo.util.failingCoroutine
+import com.egecius.coroutinesdemo.util.nonFailingCoroutine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runBlockingTest
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.Ignore
 import org.junit.Test
 
@@ -67,4 +68,16 @@ class SupervisorScopeDemoTest {
         }
     }
 
+    @Test
+    fun `exception thrown in a child does not cancel siblings`() = runBlocking {
+        supervisorScope {
+            launch {
+                failingCoroutine()
+            }
+            launch {
+                nonFailingCoroutine()
+            }
+        }
+        Unit
+    }
 }
