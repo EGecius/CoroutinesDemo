@@ -6,15 +6,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.flowOn
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +22,24 @@ class MainActivity : AppCompatActivity() {
         setClickListener()
         model.startModelling()
 
-//        demoLaunchWhenStarted()
+        showHowWithContextChangesThreads()
+    }
+
+    private fun showHowWithContextChangesThreads() {
+        GlobalScope.launch(Dispatchers.Main) {
+            val name = Thread.currentThread().name
+            Log.i("Eg:MainActivity:28", "onCreate thread name: $name")
+            showHowToUseDispatchers()
+            val name2 = Thread.currentThread().name
+            Log.i("Eg:MainActivity:31", "onCreate thread name: $name2")
+        }
+    }
+
+    private suspend fun showHowToUseDispatchers() {
+        withContext(Dispatchers.IO) {
+            val name = Thread.currentThread().name
+            Log.i("Eg:MainActivity:39", "showHowToUseDispatchers thread name: $name")
+        }
     }
 
     private fun demoLaunchWhenStarted() {
@@ -58,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchFakeApiRequestAndUpdateUi() {
-        CoroutineScope(IO).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             // starting in IO thread
             val result1 = getResultFromApi(RESULT_1)
             println("debug: $result1")
@@ -83,7 +96,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun setTextOnMainThread(input: String) {
-        withContext(Main) {
+        withContext(Dispatchers.Main) {
             val newText = text_view.text.toString() + "\n" + input
             text_view.text = newText
         }
