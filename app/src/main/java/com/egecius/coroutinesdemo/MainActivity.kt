@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -22,7 +23,26 @@ class MainActivity : AppCompatActivity() {
         setClickListener()
         model.startModelling()
 
-        showHowWithContextChangesThreads()
+        showHowToControlThreadInFlow()
+    }
+
+    private fun showHowToControlThreadInFlow() {
+       GlobalScope.launch(Main) {
+           val name = Thread.currentThread().name
+           Log.v("Eg:MainActivity:33", "showHowToControlThreadInFlow thread name: $name")
+           demoFlow().collect {
+               val name2 = Thread.currentThread().name
+               Log.d("Eg:MainActivity:35", "showHowToControlThreadInFlow() name2: $name2")
+           }
+       }
+    }
+
+    private fun demoFlow(): Flow<Int> {
+        return flow {
+            val name = Thread.currentThread().name
+            Log.w("Eg:MainActivity:43", "demoFlow thread name: $name")
+            emit(1)
+        }.flowOn(Dispatchers.IO)
     }
 
     private fun showHowWithContextChangesThreads() {
