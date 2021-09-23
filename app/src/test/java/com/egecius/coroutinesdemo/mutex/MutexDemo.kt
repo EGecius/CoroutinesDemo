@@ -1,5 +1,6 @@
 package com.egecius.coroutinesdemo.mutex
 
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,7 +17,7 @@ class MutexDemo {
     fun `with mutex incrementation is done correctly`() = runBlocking {
 
         withContext(Dispatchers.Default) {
-            massiveRun {
+            run1kTimes {
                 // protect each increment with lock
                 mutex.withLock {
                     counter++
@@ -24,12 +25,23 @@ class MutexDemo {
             }
         }
         println("Counter = $counter")
+
+        counter shouldBe 1000
+    }
+
+    @Test
+    fun `without mutex incrementation will not work correctly`() = runBlocking {
+        withContext(Dispatchers.Default) {
+            run1kTimes {
+                counter++
+            }
+            println("Counter = $counter")
+        }
+        counter shouldBe 1000
     }
 }
 
-
-
-suspend fun massiveRun(action: suspend () -> Unit) {
+suspend fun run1kTimes(action: suspend () -> Unit) {
     val n = 10  // number of coroutines to launch
     val k = 100 // times an action is repeated by each coroutine
     val time = measureTimeMillis {
