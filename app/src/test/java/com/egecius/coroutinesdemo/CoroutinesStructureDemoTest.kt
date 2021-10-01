@@ -4,16 +4,21 @@ package com.egecius.coroutinesdemo
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.egecius.coroutinesdemo.util.MainCoroutineRule
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import java.lang.Thread.sleep
 import java.net.UnknownHostException
 import java.util.concurrent.CancellationException
 
@@ -206,5 +211,23 @@ class CoroutinesStructureDemoTest {
 
             assertThat(hasExecutedPastEnsureActive).isFalse()
         }
+    }
+
+    @Ignore("this would finish if sleep() is replaced with delay()")
+    @Test
+    fun `flow will not stop executing when its scope is cancelled, unless we or another coroutine cancels it`() = runBlocking {
+
+        val job = launch {
+            flow {
+                while (true) {
+                    println("still running...")
+                    sleep(100)
+                    emit(Unit)
+                }
+            }.collect {}
+        }
+
+        delay(250)
+        job.cancel()
     }
 }
