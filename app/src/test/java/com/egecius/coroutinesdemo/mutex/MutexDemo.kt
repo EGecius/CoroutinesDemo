@@ -42,16 +42,16 @@ class MutexDemo {
 }
 
 suspend fun run1kTimes(action: suspend () -> Unit) {
-    val n = 10  // number of coroutines to launch
-    val k = 100 // times an action is repeated by each coroutine
+    val noOfCoroutines = 10  // number of coroutines to launch
+    val noOfActions = 100 // times an action is repeated by each coroutine
     val time = measureTimeMillis {
         coroutineScope { // scope for coroutines
-            repeat(n) {
+            repeat(noOfCoroutines) {
                 launch {
-                    repeat(k) { action() }
+                    repeat(noOfActions) { action() }
                 }
             }
         }
     }
-    println("Completed ${n * k} actions in $time ms")
+    println("Completed ${noOfCoroutines * noOfActions} actions in $time ms")
 }
