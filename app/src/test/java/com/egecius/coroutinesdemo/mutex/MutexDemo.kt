@@ -39,6 +39,14 @@ class MutexDemo {
         }
         counter shouldBe 1000
     }
+
+    @Test
+    fun `using 2 locks produces a deadlock - the test will never finish`() = runBlocking {
+        mutex.withLock {
+            mutex.withLock {
+            }
+        }
+    }
 }
 
 suspend fun run1kTimes(action: suspend () -> Unit) {
